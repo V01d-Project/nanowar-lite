@@ -38,7 +38,7 @@ function launch(s,c,target,kind,power=0){const u={id:s.nextUnit++,kind,side:c.ow
  if(kind==='w'){unitPower(u,0);u.x+=Math.cos(u.angle)*(c.ray2*.8-u.ray);u.y+=Math.sin(u.angle)*(c.ray2*.8-u.ray);}s.units.push(u);return u;}
 function sendFleet(s,ids,targetId,side,percent=50){const target=s.cells[targetId];if(!target||s.over||side<1||side>4)return 0;let count=0;for(const id of new Set(ids)){const c=s.cells[id];if(!canSend(c,side)||c===target)continue;if(c.type!=='n'){if(c.type==='f'&&target.type!=='n')continue;launch(s,c,target,c.type);c.ready=false;setPower(c,c.u-c.powerMax);count++;}else{let n=Math.trunc(c.u*clamp(percent,0,100)/100);count+=n;while(n>0){launch(s,c,target,'w',Math.min(100,n));n-=100;}}}return count;}
 function growthInterval(c){return c.interval;} // WhiteBloodCell.as:57: fixed SIZE interpolation.
-function produce(c){if(c.own===0&&c.fat===-1)return;if(c.fat===-1||c.fat===c.own){if(c.u>100)c.u--;else if(c.u<100&&c.own!==0)c.u++;}else c.u--;c.u=clamp(c.u>>>0,0,1000);sync(c);c.delay=Math.trunc(c.interval*1000/(c.antibody?1.5:1))/1000*(1-upgrade(c,'time'));}
+function produce(c){if(c.own===0&&c.fat===-1)return;if(c.fat===-1||c.fat===c.own){if(c.u>100)c.u--;else if(c.u<100&&c.own!==0)c.u++;}else c.u--;c.u=clamp(Math.trunc(c.u),0,1000);sync(c);c.delay=Math.trunc(c.interval*1000/(c.antibody?1.5:1))/1000*(1-upgrade(c,'time'));}
 // Unit.as:18-20,326-333: bounce3.5, attenuation0.85; collision coefficient1.5.
 function bounce(u,o){const a=Math.atan2(o.y-u.y,o.x-u.x),v=3.5+u.v+(o.v||0);u.bx=-Math.cos(a)*v;u.by=-Math.sin(a)*v;}
 function separate(u,o){const a=Math.atan2(o.y-u.y,o.x-u.x);u.x-=Math.cos(a)/1.5;u.y-=Math.sin(a)/1.5;}
