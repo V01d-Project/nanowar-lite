@@ -40,7 +40,7 @@
   <button id="restart">重开</button>
   <button id="speed">速度 x1</button>
 </div>
-<div class="hint" id="hint">圈选自己的细胞 → 点目标出兵 50%<br>普通克盾 · 盾克刺 · 刺克普通</div>
+<div class="hint" id="hint">圈选自己的细胞 → 点目标出兵 50%<br>脂肪细胞囤得多，抗体细胞产得快</div>
 <div id="msg"><div class="card"><h1 id="mtitle"></h1><p id="msub"></p><button id="again">再来一局</button></div></div>
 <script>
 (() => {
@@ -49,7 +49,7 @@
   let W = 0, H = 0, DPR = 1;
   let speedMul = 1;
 
-  // type: 0 普通 · 1 盾 · 2 刺   (普通克盾, 盾克刺, 刺克普通)
+  // type: 0 普通 · 1 脂肪 · 2 抗体
   const MAP = [
     { x:0.16, y:0.80, own:1, u:30, g:1.0, r:0.070, t:0 },
     { x:0.30, y:0.90, own:1, u:18, g:0.8, r:0.055, t:1 },
@@ -69,17 +69,16 @@
 
   const CAP = 100;
   const TRAVEL = 107;      // px/s
-  const ADV = 1.35;        // 克制方倍率
-  const DIS = 0.72;        // 被克方倍率
 
-  const beats = (a, b) => (a === 0 && b === 1) || (a === 1 && b === 2) || (a === 2 && b === 0);
-  const mult = (atk, def) => atk === def ? 1 : (beats(atk, def) ? ADV : DIS);
 
   const padX = () => Math.max(26, W * 0.085);
   const padTop = () => Math.max(78, H * 0.085);
   const padBottom = () => Math.max(118, H * 0.14);
   const PX = (c) => [padX() + c.x * (W - padX() * 2), padTop() + c.y * (H - padTop() - padBottom())];
   const RAD = (c) => Math.min(c.r * Math.min(W, H) * 1.05, Math.min(W, H) * 0.13);
+
+  const capOf = (c) => c.t === 1 ? 200 : c.t === 2 ? 80 : 100;
+  const growOf = (c) => c.t === 1 ? c.g * 0.55 : c.t === 2 ? c.g * 1.7 : c.g;
 
   function reset() {
     cells = MAP.map((m, i) => ({ id:i, x:m.x, y:m.y, own:m.own, u:m.u, g:m.g, r:m.r, t:m.t }));
@@ -192,9 +191,9 @@
   function resolve(f) {
     const c = cells[f.to];
     if (!c) return;
-    if (c.own === f.own) { c.u = Math.min(CAP, c.u + f.n); return; }
-    const power = f.n * mult(f.type, c.t);
-    if (power > c.u) { c.own = f.own; c.u = Math.min(CAP, power - c.u); }
+    if (c.own === f.own) { c.u = Math.min(capOf(c), c.u + f.n); return; }
+    const power = f.n;
+    if (power > c.u) { c.own = f.own; c.u = Math.min(capOf(c), power - c.u); }
     else { c.u -= power; }
   }
 
@@ -213,7 +212,7 @@
       if (d < bd) { bd = d; best = c; }
     }
     if (!best) return;
-    const need = best.u / mult(src.t, best.t);
+    const need = best.u;
     if (src.u > need * 1.12 + 4) {
       const n = Math.floor(src.u * 0.5);
       if (n < 1) return;
@@ -241,7 +240,7 @@
     const dt = Math.min(0.05, (now - last) / 1000) * speedMul;
     last = now;
     if (!over) {
-      for (const c of cells) if (c.own !== 0) c.u = Math.min(CAP, c.u + c.g * dt);
+      for (const c of cells) if (c.own !== 0) c.u = Math.min(capOf(c), c.u + growOf(c) * dt);
       for (const f of fleets) {
         f.t += dt / f.dur;
         const k = Math.min(1, f.t);
@@ -258,14 +257,22 @@
 
   function glyph(c, x, y, R) {
     ctx.save();
-    ctx.strokeStyle = 'rgba(255,255,255,.55)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    const s = R * 0.62;
-    if (c.t === 0) { ctx.arc(x, y - R * 0.42, s * 0.34, 0, Math.PI * 2); }
-    else if (c.t === 1) { ctx.rect(x - s * 0.30, y - R * 0.42 - s * 0.30, s * 0.60, s * 0.60); }
-    else { ctx.moveTo(x, y - R * 0.42 - s * 0.38); ctx.lineTo(x - s * 0.36, y - R * 0.42 + s * 0.26); ctx.lineTo(x + s * 0.36, y - R * 0.42 + s * 0.26); ctx.closePath(); }
-    ctx.stroke();
+    if (c.t === 1) {
+      ctx.strokeStyle = 'rgba(255,255,255,.34)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, R * 0.62, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, R * 0.38, 0, Math.PI * 2); ctx.stroke();
+    } else if (c.t === 2) {
+      ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      const spikes = 8, ro = R * 0.66, ri = R * 0.46;
+      for (let i = 0; i < spikes * 2; i++) {
+        const ang = (Math.PI / spikes) * i - Math.PI / 2;
+        const rad = i % 2 ? ri : ro;
+        const px = x + Math.cos(ang) * rad, py = y + Math.sin(ang) * rad;
+        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.closePath(); ctx.stroke();
+    }
     ctx.restore();
   }
 
