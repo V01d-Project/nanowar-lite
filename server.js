@@ -1,17 +1,20 @@
 /* Zero-dependency authoritative multiplayer: HTTP commands + SSE snapshots. Node 22+. */
 'use strict';
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-const Core=require('./src/core.js'),Levels=require('./src/levels.js');
+const Core=require('./src/core.js'),Arena=require('./src/arena.js');
 const ROOT=__dirname,GRACE=30000,rooms=new Map(),sessions=new Map();
 const fail=(status,message)=>Object.assign(new Error(message),{status});
-function options(o={}){if(!o||typeof o!=='object'||Array.isArray(o))throw fail(400,'配置格式无效');const n=(v,max)=>{if(!Number.isInteger(v)||v<0||v>max)throw fail(400,'配置数值无效');return v;};const upgrades={};for(const k of ['speed','time','shield','special'])upgrades[k]=n(o.upgrades?.[k]??0,4);return {level:n(o.level??1,25),difficulty:n(o.difficulty??0,2),upgrades};}
-function roomView(r){return {code:r.code,phase:r.phase,options:r.options,revision:r.revision,round:r.round,winner:r.winner,reason:r.reason,players:r.players.map(p=>p?{side:p.side,connected:!!p.stream,ready:p.ready,rematch:p.rematch,expires:p.deadline}:null)};}
+function options(o={}){if(!o||typeof o!=='object'||Array.isArray(o))throw fail(400,'配置格式无效');const n=(v,max)=>{if(!Number.isInteger(v)||v<0||v>max)throw fail(400,'配置数值无效');return v;};const upgrades={};for(const k of ['speed','time','shield','special'])upgrades[k]=n(o.upgrades?.[k]??0,4);return {level:n(o.level??1,2),difficulty:0,upgrades};}
+function roomView(r){return {code:r.code,phase:r.phase,options:r.options,revision:r.revision,round:r.round,winner:r.winner,reason:r.reason,seed:r.seed||0,fairMode:true,players:r.players.map(p=>p?{side:p.side,connected:!!p.stream,ready:p.ready,rematch:p.rematch,expires:p.deadline}:null)};}
 function packet(r){return {room:roomView(r),state:r.state};}
 function emit(p,data){if(!p?.stream||p.stream.destroyed||p.stream.writableEnded)return;if(p.stream.writableLength>1024*1024){p.stream.destroy();return;}p.stream.write('data: '+data+'\n\n');}
 function broadcast(r){r.revision++;const data=JSON.stringify(packet(r));for(const p of r.players)emit(p,data);r.touched=Date.now();}
 function seat(r,side){const p={token:crypto.randomBytes(24).toString('hex'),room:r,side,stream:null,deadline:Date.now()+GRACE,ready:false,rematch:false,selected:[],percent:50,seq:0,bucket:0,bucketAt:Date.now(),lastSeen:Date.now(),left:false};r.players[side-1]=p;sessions.set(p.token,p);return p;}
 function detach(p,stream){if(p.stream!==stream)return;p.stream=null;p.deadline=Date.now()+GRACE;if(rooms.has(p.room.code))broadcast(p.room);}
-function start(r){const o=r.options,map=Levels.levels[o.level].cells.map(c=>Object.assign({},c,{own:c.own>1?2:c.own,fat:c.fat>1?2:(c.fat??-1)}));r.state=Core.createState(map,{level:o.level,difficulty:o.difficulty,seed:crypto.randomBytes(4).readUInt32BE()||1,upgrades:{1:o.upgrades,2:o.upgrades},ai:[]});r.phase='playing';r.round++;r.winner=0;r.reason='';for(const p of r.players){p.selected=[];p.percent=50;p.rematch=false;}broadcast(r);}
+function start(r){const o=r.options;r.seed=crypto.randomBytes(4).readUInt32BE()||1;r.state=Arena.create(o.level,o.upgrades,r.seed);r.pending=[[],[]];r.frame=0;r.phase='playing';r.round++;r.winner=0;r.reason='';for(const p of r.players){p.selected=[];p.percent=50;p.rematch=false;}broadcast(r);}
+// Commands admitted during a frame are applied together at its boundary, not during HTTP arrival.
+// Alternate side priority every frame with a seed-chosen first side, never host priority.
+function advance(r){const first=(r.frame+++(r.seed&1))%2;const q=r.pending;r.pending=[[],[]];while(q[0].length||q[1].length)for(const i of [first,1-first]){const m=q[i].shift();if(!m)continue;const ids=m.ids.filter(id=>r.state.cells[id]?.own===i+1);Core.sendFleet(r.state,ids,m.target,i+1,m.percent);}Core.step(r.state,Core.FRAME);}
 function removeRoom(r){for(const p of r.players)if(p){sessions.delete(p.token);const stream=p.stream;p.stream=null;stream?.end();}rooms.delete(r.code);}
 function command(p,m){const r=p.room,now=Date.now();if(now-p.bucketAt>=1000){p.bucket=0;p.bucketAt=now;}if(++p.bucket>60)throw fail(429,'操作过快');if(!Number.isSafeInteger(m.seq)||m.seq<=p.seq)throw fail(409,'指令序号过期');p.seq=m.seq;p.lastSeen=now;
  const both=()=>r.players.every(q=>q?.stream),lobby=()=>{if(r.phase!=='lobby')throw fail(409,'不在准备阶段');};
@@ -29,20 +32,32 @@ function command(p,m){const r=p.room,now=Date.now();if(now-p.bucketAt>=1000){p.b
  if(!Number.isInteger(m.target)||!r.state.cells[m.target])throw fail(400,'目标无效');
  const percent=m.percent??p.percent;if(![25,50,75,100].includes(percent))throw fail(400,'派兵比例无效');
  const sources=m.action==='special'?ids.filter(id=>r.state.cells[id].type!=='n'):ids;
- Core.sendFleet(r.state,sources,m.target,p.side,percent);p.selected=[];break;}
+ if(r.pending[p.side-1].length>=32)throw fail(429,'本帧指令过多');r.pending[p.side-1].push({ids:[...sources],target:m.target,percent});p.selected=[];break;}
  default:throw fail(400,'未知指令');
  }broadcast(r);
 }
 async function body(req){let bytes=0,chunks=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>16384)throw fail(413,'请求过大');chunks.push(chunk);}try{const m=JSON.parse(Buffer.concat(chunks).toString('utf8'));if(!m||typeof m!=='object'||Array.isArray(m))throw Error();return m;}catch{throw fail(400,'无效 JSON');}}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));}
 function authenticate(token){const p=sessions.get(token);if(!p||(!p.stream&&Date.now()>=p.deadline))throw fail(401,'席位已过期，请重新建房/加入');return p;}
-function createServer(){const server=http.createServer(async(req,res)=>{try{
+function createServer(config={}){
+ const allowed=String(config.allowedOrigins??process.env.ALLOWED_ORIGINS??'*').split(',').map(s=>s.trim()).filter(Boolean);
+ const server=http.createServer(async(req,res)=>{try{
  const url=new URL(req.url,'http://localhost');
- // Same-origin only; no permissive CORS. Configure the reverse proxy to preserve Host.
- if(req.headers.origin&&req.headers.origin!==((req.headers['x-forwarded-proto']==='https'?'https':'http')+'://'+req.headers.host))throw fail(403,'跨站请求被拒绝');
+ if(url.pathname.startsWith('/api/')){
+  const origin=req.headers.origin;
+  res.setHeader('Vary','Origin');
+  if(origin&&!allowed.includes('*')&&!allowed.includes(origin))throw fail(403,'此页面来源不在服务器 ALLOWED_ORIGINS 白名单');
+  // No cookies/credentials: seat bearer tokens authorize commands; wildcard includes file:// null origins.
+  res.setHeader('Access-Control-Allow-Origin',allowed.includes('*')?'*':(origin||allowed[0]||'null'));
+  res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers','Content-Type');
+  res.setHeader('Access-Control-Max-Age','600');
+  if(req.method==='OPTIONS'){res.writeHead(204).end();return;}
+ }
+ if(url.pathname==='/api/health'&&req.method==='GET'){json(res,200,{service:'nanowar',fairMode:true});return;}
  if(url.pathname==='/api/events'&&req.method==='GET'){
  const p=authenticate(url.searchParams.get('token'));if(p.stream)throw fail(409,'此席位已有连接');
- res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no','Referrer-Policy':'no-referrer'});res.write('retry: 1000\n\n');p.stream=res;p.deadline=0;p.lastSeen=Date.now();req.on('close',()=>detach(p,res));res.on('error',()=>detach(p,res));broadcast(p.room);return;
+ res.writeHead(200,{'Content-Type':'text/event-stream','Cache-Control':'no-cache, no-transform','Connection':'keep-alive','X-Accel-Buffering':'no','Referrer-Policy':'no-referrer'});res.flushHeaders();res.write('retry: 1000\n\n');p.stream=res;p.deadline=0;p.lastSeen=Date.now();req.on('close',()=>detach(p,res));res.on('error',()=>detach(p,res));broadcast(p.room);return;
  }
  if(url.pathname.startsWith('/api/')){
  if(req.method!=='POST')throw fail(405,'请使用 POST');const m=await body(req);
@@ -67,7 +82,7 @@ function createServer(){const server=http.createServer(async(req,res)=>{try{
  const timer=setInterval(()=>{const now=Date.now();for(const r of rooms.values()){
  for(const p of r.players){if(p?.stream&&now-p.lastSeen>15000){const stream=p.stream;detach(p,stream);stream.destroy();}if(!p||p.stream||now<p.deadline)continue;sessions.delete(p.token);if(r.phase==='playing'){r.phase='finished';r.winner=3-p.side;r.reason=p.left?'对手已离房':'对手断线超过30秒';broadcast(r);}if(r.phase==='lobby'){if(p.side===1){r.phase='closed';r.reason='房主已离房或保留超时';}r.players[p.side-1]=null;for(const q of r.players)if(q)q.ready=false;broadcast(r);}}
  if(!r.players.some(p=>p?.stream)&&now-r.touched>GRACE){removeRoom(r);continue;}
- if(r.phase==='playing'&&r.players.every(p=>p?.stream)){Core.step(r.state,Core.FRAME);if(r.state.over){r.phase='finished';r.winner=r.state.over;r.reason='全部细胞和在途兵力结算';}broadcast(r);}
+ if(r.phase==='playing'&&r.players.every(p=>p?.stream)){advance(r);if(r.state.over){r.phase='finished';r.winner=r.state.over;r.reason='全部细胞和在途兵力结算';}broadcast(r);}
  }},1000/Core.FPS);timer.unref();
  const heartbeat=setInterval(()=>{for(const p of sessions.values())if(p.stream&&!p.stream.destroyed&&!p.stream.writableEnded)p.stream.write('event: heartbeat\ndata: {}\n\n');},10000);heartbeat.unref();
  server.requestTimeout=10000;server.headersTimeout=10000;

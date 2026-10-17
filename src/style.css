@@ -2,3 +2,5 @@
 
 /* Network UI does not change the single-player battlefield layout. */
 #net-open{position:fixed;top:96px;right:8px;padding:5px 8px;font-size:10px;z-index:11}#net-panel{max-height:90dvh;overflow:auto;max-width:420px}#net-panel fieldset{border:1px solid #ffffff20;border-radius:10px;margin-top:12px}#net-panel input{width:130px;background:#091322;color:#dbe7f5;border:1px solid #ffffff40;border-radius:6px;padding:8px;text-transform:uppercase}#net-panel button{margin-top:8px}#net-error{color:#ff9fa6}button:disabled{opacity:.45}#net-panel [hidden]{display:none}
+
+#net-panel #net-server{width:68%;min-width:0;text-transform:none}#net-fair{color:#9fe3ba;font-weight:600}#net-panel #net-code{text-transform:uppercase}

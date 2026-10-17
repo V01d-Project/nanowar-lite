@@ -13,7 +13,7 @@ function renderNet(){
  $('tip').textContent='房间 '+(r?.code||'连接中')+' · 我方 '+(side()===1?'蓝色':'红色');
  $('status').textContent=net.status();
  const finished=r?.phase==='finished';$('msg').hidden=!finished;
- if(finished){$('mtitle').textContent=r.winner===side()?'战场已掌控':'细胞已失守';$('msub').textContent=r.reason+' · 双方同意后回到准备面板';$('next').hidden=true;$('again').textContent=r.players[side()-1]?.rematch?'等待对方同意':'请求重赛';}
+ if(finished){$('mtitle').textContent=r.winner===3?'双方平局':r.winner===side()?'战场已掌控':'细胞已失守';$('msub').textContent=r.reason+' · 双方同意后回到准备面板';$('next').hidden=true;$('again').textContent=r.players[side()-1]?.rematch?'等待对方同意':'请求重赛';}
  renderer.draw(state,ui);
 }
 const app={get state(){return state;},ui,renderer,reset,render,campaign,paused:false,
