@@ -75,6 +75,7 @@
   let aiTimer = 0;
 
   const CAP = 100;
+  const TRAVEL = 160; // 像素/秒，原版节奏偏慢
   const padX = () => Math.max(26, W * 0.085);
   const padTop = () => Math.max(78, H * 0.085);
   const padBottom = () => Math.max(118, H * 0.14);
@@ -187,7 +188,7 @@
       const [ax, ay] = PX(c), [bx, by] = PX(target);
       const dist = Math.hypot(bx - ax, by - ay);
       fleets.push({ from:c.id, to:target.id, own:1, n, x:ax, y:ay, sx:ax, sy:ay,
-        tx:bx, ty:by, t:0, dur: Math.max(0.25, dist / (900 * speedMul * 1)) });
+        tx:bx, ty:by, t:0, dur: Math.max(0.9, dist / (TRAVEL * speedMul)) });
       moved = true;
     }
     if (moved) selected.clear();
@@ -224,7 +225,7 @@
       src.u -= n;
       const [ax, ay] = PX(src), [bx, by] = PX(best);
       fleets.push({ from:src.id, to:best.id, own:2, n, x:ax, y:ay, sx:ax, sy:ay, tx:bx, ty:by, t:0,
-        dur: Math.max(0.25, Math.hypot(bx - ax, by - ay) / 900) });
+        dur: Math.max(0.9, Math.hypot(bx - ax, by - ay) / TRAVEL) });
     }
   }
 
