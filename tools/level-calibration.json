@@ -1,0 +1,261 @@
+{
+  "sourceFPS": 25,
+  "totalLevels": 25,
+  "restored": 25,
+  "totalCells": 372,
+  "rows": [
+    {
+      "level": 1,
+      "cells": 2,
+      "comparedCellFields": 18,
+      "ai": [],
+      "sha256": "c632843ce4758feb75b1d407226433111071f6d9229e8ef054c9a6520489d116",
+      "status": "PASS"
+    },
+    {
+      "level": 2,
+      "cells": 3,
+      "comparedCellFields": 27,
+      "ai": [],
+      "sha256": "8755ccac99b0e71369c015af6b63fa34338f2ae5c83c16cde11d9b82701b1a37",
+      "status": "PASS"
+    },
+    {
+      "level": 3,
+      "cells": 5,
+      "comparedCellFields": 45,
+      "ai": [],
+      "sha256": "03771c65ebf18f30c4aebb2c3baebd29e79a0be87f40bd0e0031a811ec8771e3",
+      "status": "PASS"
+    },
+    {
+      "level": 4,
+      "cells": 3,
+      "comparedCellFields": 27,
+      "ai": [],
+      "sha256": "95b6bd49cd167e48810fdd2b35e06911f3255b7ce8e93a582b2a5db64a04b013",
+      "status": "PASS"
+    },
+    {
+      "level": 5,
+      "cells": 8,
+      "comparedCellFields": 72,
+      "ai": [
+        "noob:2@5000"
+      ],
+      "sha256": "7eb35d974747b6a328cd650ef43b2cf720fcb47209ffda8684a2949390ef89b2",
+      "status": "PASS"
+    },
+    {
+      "level": 6,
+      "cells": 10,
+      "comparedCellFields": 90,
+      "ai": [
+        "easy:2@5000"
+      ],
+      "sha256": "7681923d82cfe7083a38e1a4475b9179fe1b3a446122c4e7703ea032d44f590f",
+      "status": "PASS"
+    },
+    {
+      "level": 7,
+      "cells": 15,
+      "comparedCellFields": 135,
+      "ai": [
+        "noob:3@7000",
+        "easy:2@8000"
+      ],
+      "sha256": "85fd4b643f6f2f73f7db83961a5c39b1a0e495d11ef6de2e7ac2d0faa87b2836",
+      "status": "PASS"
+    },
+    {
+      "level": 8,
+      "cells": 18,
+      "comparedCellFields": 162,
+      "ai": [
+        "easy:2@6000",
+        "easy:3@8000"
+      ],
+      "sha256": "7722f31485537b630bee544b413ba7785e84cef6e89a2c48a2e8b774a977e032",
+      "status": "PASS"
+    },
+    {
+      "level": 9,
+      "cells": 6,
+      "comparedCellFields": 54,
+      "ai": [
+        "tutorialfat:2@6000"
+      ],
+      "sha256": "4248ac1831a28f72a89ce81e181f9a9815745049d4d68d430ad31faa577bd7b9",
+      "status": "PASS"
+    },
+    {
+      "level": 10,
+      "cells": 14,
+      "comparedCellFields": 126,
+      "ai": [
+        "easy:2@5000"
+      ],
+      "sha256": "44d70144d6232be639b67a25d043f30e865ba3d1f5b71b1935ae61192b7d8cbb",
+      "status": "PASS"
+    },
+    {
+      "level": 11,
+      "cells": 15,
+      "comparedCellFields": 135,
+      "ai": [
+        "easy:2@5000"
+      ],
+      "sha256": "0513e0d33171e56f1d09c7096a299291abd17cea634da3761747da3a44d8ee6b",
+      "status": "PASS"
+    },
+    {
+      "level": 12,
+      "cells": 19,
+      "comparedCellFields": 171,
+      "ai": [
+        "easy:2@5000",
+        "easy:3@4000"
+      ],
+      "sha256": "3ca2dae5926f8fa1ab58bd6a12f7b5514234a9836f7684ce027060b689b26d6a",
+      "status": "PASS"
+    },
+    {
+      "level": 13,
+      "cells": 24,
+      "comparedCellFields": 216,
+      "ai": [
+        "easy:2@5000",
+        "easy:3@4000",
+        "easy:4@6000"
+      ],
+      "sha256": "50b2ffda33183f15f4a532ce9a8425ad80086ce272ecc2707a6f04c52eb74211",
+      "status": "PASS"
+    },
+    {
+      "level": 14,
+      "cells": 15,
+      "comparedCellFields": 135,
+      "ai": [
+        "normal:2@5000"
+      ],
+      "sha256": "9226c792fbf44540b98cc12707aa5aafa81ac08d400b132c0ed7e6e3cfabd9a9",
+      "status": "PASS"
+    },
+    {
+      "level": 15,
+      "cells": 16,
+      "comparedCellFields": 144,
+      "ai": [
+        "normal:2@5000"
+      ],
+      "sha256": "e72b1af9bc78a20a8f68b11599c12e1dff8a94debd5c540e14f3311c50d961b3",
+      "status": "PASS"
+    },
+    {
+      "level": 16,
+      "cells": 17,
+      "comparedCellFields": 153,
+      "ai": [
+        "normal:2@5000"
+      ],
+      "sha256": "c3c57ba159380e4b207f5dd6fbb66e81ad897cfa7e799c53afe9f6cadc0c4bc5",
+      "status": "PASS"
+    },
+    {
+      "level": 17,
+      "cells": 20,
+      "comparedCellFields": 180,
+      "ai": [
+        "normal:2@5000",
+        "normal:3@5000"
+      ],
+      "sha256": "a2d2864ec94487f9a35160fecce4044a72080322c0cd42bad84ae183e2a1220f",
+      "status": "PASS"
+    },
+    {
+      "level": 18,
+      "cells": 22,
+      "comparedCellFields": 198,
+      "ai": [
+        "normal:2@5000",
+        "normal:3@6000",
+        "easy:4@6000"
+      ],
+      "sha256": "cafbf72ae1030fa723e37adb718c1071a548416f1f101068142e4a656e3ebf8a",
+      "status": "PASS"
+    },
+    {
+      "level": 19,
+      "cells": 7,
+      "comparedCellFields": 63,
+      "ai": [],
+      "sha256": "14ed22b06c75ba4548d81502a8865fc34b1ad4a0976fb25b4119f19bfd27c3f2",
+      "status": "PASS"
+    },
+    {
+      "level": 20,
+      "cells": 17,
+      "comparedCellFields": 153,
+      "ai": [
+        "normal:2@4000"
+      ],
+      "sha256": "d50310711475db569ddc548b09e3819f32680eff964532c92a99060a3ae81763",
+      "status": "PASS"
+    },
+    {
+      "level": 21,
+      "cells": 21,
+      "comparedCellFields": 189,
+      "ai": [
+        "normal:2@4000"
+      ],
+      "sha256": "8b68e9efbf8d306a22eb5a384b75b768d274d85e789cdc243de6adb00fc29114",
+      "status": "PASS"
+    },
+    {
+      "level": 22,
+      "cells": 25,
+      "comparedCellFields": 225,
+      "ai": [
+        "normal:2@4000",
+        "normal:3@4500"
+      ],
+      "sha256": "976b5d87b8da0a4b31133e7e46231c689317eae4ae30cf2129cca3628730db13",
+      "status": "PASS"
+    },
+    {
+      "level": 23,
+      "cells": 22,
+      "comparedCellFields": 198,
+      "ai": [
+        "normal:2@4000",
+        "normal:3@4500"
+      ],
+      "sha256": "ac1d0f78ae43ffc9cba9f075270fe23dd621f1860d73e4fa2ba0fd15ba232ba7",
+      "status": "PASS"
+    },
+    {
+      "level": 24,
+      "cells": 22,
+      "comparedCellFields": 198,
+      "ai": [
+        "normal:2@3500",
+        "normal:3@4000"
+      ],
+      "sha256": "f0450e4f1f24375df9cc863f4beefea4133a0a77923dc6d01a80566a121e87e7",
+      "status": "PASS"
+    },
+    {
+      "level": 25,
+      "cells": 26,
+      "comparedCellFields": 234,
+      "ai": [
+        "normal:2@4000",
+        "normal:3@4500",
+        "normal:4@3000"
+      ],
+      "sha256": "3023d3728fbfb63872b9e9b898646d54571a92433d8ebcac999905e2415a8f4b",
+      "status": "PASS"
+    }
+  ]
+}

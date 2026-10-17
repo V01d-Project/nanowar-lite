@@ -1,0 +1,1 @@
+const {readTimeline}=require('./read-map.cjs'),d=readTimeline();for(const f of d.frames.slice(0,25)){const a=f.objects.filter(o=>[232,234,236,238].includes(o.symbol));console.log(JSON.stringify({frame:f.frame,ai:a}));}

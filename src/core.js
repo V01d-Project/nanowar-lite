@@ -3,8 +3,8 @@
 'use strict';
 // Game.as:42-51. Upgrade levels are indices, not multipliers.
 const UPGRADES={speed:[0,.04,.12,.18,.25],time:[0,.02,.06,.09,.12],shield:[.4,.45,.5,.55,.6],special:[1,.95,.9,.85,.8],speedUpg:[0,3,4,6,7],timeUpg:[0,3,4,6,7],shieldUpg:[0,4,5,7,8],specialUpg:[0,4,5,7,8]};
-// Requested 30fps compatibility clock. Local SWF header is actually25fps (documented in PORTING.md).
-const MAX=100,FPS=30,LOAD={f:8,a:12},FRAME=1/FPS,EPS=1e-9;
+// Main.as and SWF header: original 25fps. Movement remains px/frame, never a 30fps override.
+const MAX=100,FPS=25,LOAD_FRAMES={f:240,a:360},LOAD={f:240/FPS,a:360/FPS},FRAME=1/FPS,EPS=1e-9;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function upgrade(c,key){return UPGRADES[key][clamp(c.upgrades[key]||0,0,4)];}
 function random(s){s.seed=(Math.imul(s.seed,1664525)+1013904223)>>>0;return s.seed/4294967296;}
@@ -62,5 +62,5 @@ function winner(s){const p=powerBySide(s),n=[0,0,0,0,0];for(const c of s.cells)n
 function tick(s){s.time+=FRAME;for(const c of s.cells){sync(c);if(c.type==='n'){c.growth+=FRAME;if(c.growth+EPS>=c.delay){c.growth-=c.delay;produce(c);}}else if(c.loading){c.timer+=FRAME;if(c.timer+EPS>=LOAD[c.type]){c.timer=LOAD[c.type];c.loading=false;c.ready=true;}}}s.units=s.units.filter(u=>tickUnit(s,u));for(let i=0;i<s.units.length;i++)for(let j=i+1;j<s.units.length;j++){const a=s.units[i],b=s.units[j];if(Math.trunc(Math.hypot(a.x-b.x,a.y-b.y))<a.ray+b.ray)collide(a,b);}s.minis=s.minis.filter(m=>tickMini(s,m));s.over=winner(s);}
 function clampFrame(dt){return Number.isFinite(dt)?clamp(dt,0,.05):0;}
 function step(s,seconds){if(s.over)return;s.accumulator+=clampFrame(seconds);while(s.accumulator+EPS>=FRAME&&!s.over){s.accumulator-=FRAME;tick(s);}}
-return {MAX,FPS,FRAME,LOAD,UPGRADES,createState,selectable,canSend,setPower,switchSide,arriveWhite,arriveFat,arriveAb,sendFleet,growthInterval,winner,powerBySide,clampFrame,step,random,upgrade,shieldMini,collide};
+return {MAX,FPS,FRAME,LOAD,LOAD_FRAMES,UPGRADES,createState,selectable,canSend,setPower,switchSide,arriveWhite,arriveFat,arriveAb,sendFleet,growthInterval,winner,powerBySide,clampFrame,step,random,upgrade,shieldMini,collide};
 });

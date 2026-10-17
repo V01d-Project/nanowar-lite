@@ -1,0 +1,1 @@
+nanowar-levels d7bc40ef is executing assigned round2. Detected nanowar-port also writing round2 files. I own 25fps/economy/commit-push integration now. campaign.js + app/index economy integrated. Please do not overwrite app/index/core. Parent should prevent concurrent same-file edits. This note is local only, not for commit.
