@@ -1,7 +1,7 @@
 /* Composition root: DOM and scheduling live here, never in core/AI. */
 (function(){'use strict';
 const C=NanoCore,canvas=document.getElementById('c'),renderer=NanoRender.create(canvas),$=id=>document.getElementById(id);let level=1,state,brains=[],speed=1,last=performance.now();$('level').innerHTML=Array.from({length:NanoLevels.totalLevels},(_,i)=>'<option value='+ (i+1) +'>'+String(i+1).padStart(2,'0')+' · 原版关卡</option>').join('')+'<option value=0>机制沙盒（含 AI）</option>';
-const campaign=NanoCampaign.create(),ui=NanoInput.create(canvas,renderer,()=>state);ui.percent=50;
+const campaign=NanoCampaign.create(),ui=NanoInput.create(canvas,renderer,()=>state);ui.percent=50;purchaseUI();
 function reset(){state=NanoLevels.create(level,{difficulty:Number($('difficulty').value),upgrades:{1:readUpgrades()}});brains=state.ai.map(NanoAI.create);ui.reset();last=performance.now();$('msg').hidden=true;render();}
 function readUpgrades(){return campaign.upgrades;}
 function purchaseUI(){ $('points').textContent=campaign.points;for(const key of ['speed','time','shield','special']){const cost=NanoCampaign.cost(campaign,key),button=$('buy-'+key);button.textContent='等级 '+campaign.upgrades[key]+' / 4 · '+(cost===null?'已满级':'购买 '+cost+' 点');button.disabled=cost===null||campaign.points<cost;}}
