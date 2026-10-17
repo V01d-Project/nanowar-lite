@@ -40,36 +40,38 @@
   <button id="restart">重开</button>
   <button id="speed">速度 x1</button>
 </div>
-<div class="hint" id="hint">圈选自己的细胞 → 点目标出兵 50%<br>脂肪细胞囤得多，抗体细胞产得快</div>
+<div class="hint" id="hint">圈选自己的细胞 → 点目标出兵 50%<br>脂肪细胞（圈）罩住敌人，抗体细胞（星）感染敌人</div>
 <div id="msg"><div class="card"><h1 id="mtitle"></h1><p id="msub"></p><button id="again">再来一局</button></div></div>
 <script>
 (() => {
   const cv = document.getElementById('c');
   const ctx = cv.getContext('2d');
-  let W = 0, H = 0, DPR = 1;
-  let speedMul = 1;
+  let W = 0, H = 0, DPR = 1, speedMul = 1;
 
-  // type: 0 普通 · 1 脂肪 · 2 抗体
+  // 类型：n 普通 · f 脂肪 · a 抗体
   const MAP = [
-    { x:0.16, y:0.80, own:1, u:30, g:1.0, r:0.070, t:0 },
-    { x:0.30, y:0.90, own:1, u:18, g:0.8, r:0.055, t:1 },
-    { x:0.84, y:0.20, own:2, u:30, g:1.0, r:0.070, t:0 },
-    { x:0.70, y:0.10, own:2, u:18, g:0.8, r:0.055, t:2 },
-    { x:0.50, y:0.50, own:0, u:26, g:0.6, r:0.075, t:1 },
-    { x:0.34, y:0.58, own:0, u:14, g:0.4, r:0.050, t:2 },
-    { x:0.66, y:0.42, own:0, u:14, g:0.4, r:0.050, t:0 },
-    { x:0.50, y:0.30, own:0, u:12, g:0.3, r:0.045, t:1 },
-    { x:0.50, y:0.70, own:0, u:12, g:0.3, r:0.045, t:2 },
-    { x:0.22, y:0.34, own:0, u:10, g:0.3, r:0.042, t:2 },
-    { x:0.78, y:0.66, own:0, u:10, g:0.3, r:0.042, t:1 }
+    { x:0.16, y:0.80, own:1, u:40, type:'n', r:0.070 },
+    { x:0.30, y:0.90, own:1, u:20, type:'n', r:0.055 },
+    { x:0.84, y:0.20, own:2, u:40, type:'n', r:0.070 },
+    { x:0.70, y:0.10, own:2, u:20, type:'n', r:0.055 },
+    { x:0.50, y:0.50, own:0, u:30, type:'n', r:0.075 },
+    { x:0.34, y:0.58, own:0, u:16, type:'n', r:0.050 },
+    { x:0.66, y:0.42, own:0, u:16, type:'n', r:0.050 },
+    { x:0.50, y:0.30, own:0, u:0,  type:'f', r:0.048 },
+    { x:0.50, y:0.70, own:0, u:0,  type:'a', r:0.048 },
+    { x:0.22, y:0.34, own:0, u:12, type:'n', r:0.042 },
+    { x:0.78, y:0.66, own:0, u:12, type:'n', r:0.042 }
   ];
 
-  let cells = [], fleets = [], selected = new Set();
+  let cells = [], units = [], selected = new Set();
   let drag = null, over = 0, aiTimer = 0;
 
-  const CAP = 100;
-  const TRAVEL = 107;      // px/s
-
+  const TRAVEL = 107;        // px/s（原版节奏）
+  const POWER_MAX = 100;
+  const FAT_LOAD = 8;        // 240 帧 @30fps
+  const AB_LOAD = 12;        // 360 帧 @30fps
+  const GROW_FAST = 1.0;     // 满时每秒 +1
+  const GROW_SLOW = 0.31;    // 空时每秒 +0.31
 
   const padX = () => Math.max(26, W * 0.085);
   const padTop = () => Math.max(78, H * 0.085);
@@ -77,15 +79,15 @@
   const PX = (c) => [padX() + c.x * (W - padX() * 2), padTop() + c.y * (H - padTop() - padBottom())];
   const RAD = (c) => Math.min(c.r * Math.min(W, H) * 1.05, Math.min(W, H) * 0.13);
 
-  const capOf = (c) => c.t === 1 ? 200 : c.t === 2 ? 80 : 100;
-  const growOf = (c) => c.t === 1 ? c.g * 0.55 : c.t === 2 ? c.g * 1.7 : c.g;
-
   function reset() {
-    cells = MAP.map((m, i) => ({ id:i, x:m.x, y:m.y, own:m.own, u:m.u, g:m.g, r:m.r, t:m.t }));
-    fleets = []; selected.clear(); over = 0; aiTimer = 0;
+    cells = MAP.map((m, i) => ({
+      id:i, x:m.x, y:m.y, own:m.own, u:m.u, type:m.type, r:m.r,
+      fat:-1, antibody:false, load:0, timer:0
+    }));
+    units = []; selected.clear(); over = 0; aiTimer = 0;
     document.getElementById('msg').style.display = 'none';
     document.getElementById('hint').style.opacity = 1;
-    setTimeout(() => document.getElementById('hint').style.opacity = 0, 7000);
+    setTimeout(() => document.getElementById('hint').style.opacity = 0, 8000);
     syncHud();
   }
 
@@ -151,7 +153,7 @@
       const c = cellAt(p.x, p.y);
       if (!c) { selected.clear(); return; }
       if (selected.size && c.own !== 1) { sendFleet(c); return; }
-      if (c.own === 1) { selected = new Set([c.id]); }
+      if (c.own === 1 && c.type === 'n') { selected = new Set([c.id]); }
       else selected.clear();
       return;
     }
@@ -160,7 +162,7 @@
     const rx0 = Math.min(d.x0, d.x1), rx1 = Math.max(d.x0, d.x1);
     const ry0 = Math.min(d.y0, d.y1), ry1 = Math.max(d.y0, d.y1);
     for (const c of cells) {
-      if (c.own !== 1) continue;
+      if (c.own !== 1 || c.type !== 'n') continue;
       const [cx, cy] = PX(c);
       if (d.type === 'lasso') { if (inPoly(cx, cy, d.path)) picked.add(c.id); }
       else if (cx >= rx0 && cx <= rx1 && cy >= ry0 && cy <= ry1) picked.add(c.id);
@@ -175,33 +177,49 @@
     let moved = false;
     for (const id of selected) {
       const c = cells[id];
-      if (!c || c.own !== 1 || c.u < 2) continue;
+      if (!c || c.own !== 1 || c.type !== 'n' || c.u < 4) continue;
       const n = Math.floor(c.u * 0.5);
-      if (n < 1) continue;
+      if (n < 2) continue;
       c.u -= n;
       const [ax, ay] = PX(c), [bx, by] = PX(target);
       const dist = Math.hypot(bx - ax, by - ay);
-      fleets.push({ from:c.id, to:target.id, own:1, type:c.t, n, x:ax, y:ay, sx:ax, sy:ay,
-        tx:bx, ty:by, t:0, dur: Math.max(0.9, dist / (TRAVEL * speedMul)) });
+      units.push({ kind:'w', side:1, n, target:target.id, x:ax, y:ay, sx:ax, sy:ay, tx:bx, ty:by,
+        t:0, dur: Math.max(0.9, dist / (TRAVEL * speedMul)) });
       moved = true;
     }
     if (moved) selected.clear();
   }
 
-  function resolve(f) {
-    const c = cells[f.to];
-    if (!c) return;
-    if (c.own === f.own) { c.u = Math.min(capOf(c), c.u + f.n); return; }
-    const power = f.n;
-    if (power > c.u) { c.own = f.own; c.u = Math.min(capOf(c), power - c.u); }
-    else { c.u -= power; }
+  // 普通兵到达：抗体细胞吸收，其余按点扣血
+  function arriveWhite(cell, side, n) {
+    if (cell.own === side) { cell.u = Math.min(POWER_MAX, cell.u + n); return; }
+    let left = n;
+    if (cell.antibody) {
+      cell.u = Math.min(POWER_MAX, cell.u + left);   // 抗体把攻击转成自身能量
+      return;
+    }
+    cell.u -= left;
+    if (cell.u < 0) { cell.own = side; cell.u = -cell.u; cell.antibody = false; cell.fat = -1; }
+  }
+
+  function arriveFat(cell, side) {
+    if (cell.antibody && cell.fat === -1 && side !== cell.own) { cell.antibody = false; }
+    else if (cell.fat === -1) { cell.fat = side; }
+    else if (cell.fat !== side) { cell.fat = -1; }
+  }
+
+  function arriveAb(cell, side) {
+    if (cell.fat === -1 || cell.fat === side) {
+      cell.antibody = true;
+      if (side !== cell.own) { cell.own = side; }
+    }
   }
 
   function aiThink(dt) {
     aiTimer -= dt;
     if (aiTimer > 0) return;
     aiTimer = 1.1;
-    const mine = cells.filter(c => c.own === 2 && c.u >= 12);
+    const mine = cells.filter(c => c.own === 2 && c.type === 'n' && c.u >= 12);
     if (!mine.length) return;
     mine.sort((a, b) => b.u - a.u);
     const src = mine[0];
@@ -212,15 +230,30 @@
       if (d < bd) { bd = d; best = c; }
     }
     if (!best) return;
-    const need = best.u;
-    if (src.u > need * 1.12 + 4) {
+    if (src.u > best.u * 1.15 + 4) {
       const n = Math.floor(src.u * 0.5);
-      if (n < 1) return;
+      if (n < 2) return;
       src.u -= n;
       const [ax, ay] = PX(src), [bx, by] = PX(best);
-      fleets.push({ from:src.id, to:best.id, own:2, type:src.t, n, x:ax, y:ay, sx:ax, sy:ay, tx:bx, ty:by, t:0,
+      units.push({ kind:'w', side:2, n, target:best.id, x:ax, y:ay, sx:ax, sy:ay, tx:bx, ty:by, t:0,
         dur: Math.max(0.9, Math.hypot(bx - ax, by - ay) / (TRAVEL * speedMul)) });
     }
+  }
+
+  function spawnSpecial(cell) {
+    let best = null, bd = 1e9;
+    const [ax, ay] = PX(cell);
+    for (const c of cells) {
+      if (c.id === cell.id || c.own === cell.own) continue;
+      const [bx, by] = PX(c);
+      const d = Math.hypot(bx - ax, by - ay);
+      if (d < bd) { bd = d; best = c; }
+    }
+    if (!best) return;
+    const [bx, by] = PX(best);
+    units.push({ kind: cell.type === 'f' ? 'f' : 'a', side: cell.own, n: 1, target: best.id,
+      x: ax, y: ay, sx: ax, sy: ay, tx: bx, ty: by, t: 0,
+      dur: Math.max(1.2, bd / (TRAVEL * speedMul)) });
   }
 
   function checkEnd() {
@@ -237,43 +270,43 @@
 
   let last = performance.now();
   function loop(now) {
-    const dt = Math.min(0.05, (now - last) / 1000) * speedMul;
+    const raw = Math.min(0.05, (now - last) / 1000);
+    const dt = raw * speedMul;
     last = now;
     if (!over) {
-      for (const c of cells) if (c.own !== 0) c.u = Math.min(capOf(c), c.u + growOf(c) * dt);
-      for (const f of fleets) {
+      for (const c of cells) {
+        if (c.own === 0) continue;
+        if (c.type === 'n') {
+          // 越满产得越快：3.2s → 1.0s 一个
+          const k = 1 - Math.min(1, c.u / POWER_MAX);
+          const rate = GROW_FAST - (GROW_FAST - GROW_SLOW) * k;
+          c.u = Math.min(POWER_MAX, c.u + rate * dt);
+        } else if (c.u >= POWER_MAX) {
+          c.timer += dt;
+          if (c.timer >= (c.type === 'f' ? FAT_LOAD : AB_LOAD)) { c.timer = 0; c.u = 0; spawnSpecial(c); }
+        }
+      }
+      for (const f of units) {
         f.t += dt / f.dur;
         const k = Math.min(1, f.t);
         f.x = f.sx + (f.tx - f.sx) * k;
         f.y = f.sy + (f.ty - f.sy) * k;
       }
-      const done = fleets.filter(f => f.t >= 1);
-      if (done.length) { fleets = fleets.filter(f => f.t < 1); done.forEach(resolve); }
+      const done = units.filter(f => f.t >= 1);
+      if (done.length) {
+        units = units.filter(f => f.t < 1);
+        for (const f of done) {
+          const c = cells[f.target];
+          if (!c) continue;
+          if (f.kind === 'w') arriveWhite(c, f.side, f.n);
+          else if (f.kind === 'f') arriveFat(c, f.side);
+          else arriveAb(c, f.side);
+        }
+      }
       aiThink(dt); checkEnd(); syncHud();
     }
     draw();
     requestAnimationFrame(loop);
-  }
-
-  function glyph(c, x, y, R) {
-    ctx.save();
-    if (c.t === 1) {
-      ctx.strokeStyle = 'rgba(255,255,255,.34)'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(x, y, R * 0.62, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.arc(x, y, R * 0.38, 0, Math.PI * 2); ctx.stroke();
-    } else if (c.t === 2) {
-      ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 2;
-      ctx.beginPath();
-      const spikes = 8, ro = R * 0.66, ri = R * 0.46;
-      for (let i = 0; i < spikes * 2; i++) {
-        const ang = (Math.PI / spikes) * i - Math.PI / 2;
-        const rad = i % 2 ? ri : ro;
-        const px = x + Math.cos(ang) * rad, py = y + Math.sin(ang) * rad;
-        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
-      }
-      ctx.closePath(); ctx.stroke();
-    }
-    ctx.restore();
   }
 
   function draw() {
@@ -299,17 +332,53 @@
       ctx.lineWidth = selected.has(c.id) ? 4 : 2;
       ctx.strokeStyle = selected.has(c.id) ? '#fbbf24' : col;
       ctx.stroke();
-      glyph(c, x, y, R);
-      ctx.fillStyle = '#f1f5fb'; ctx.font = `600 ${Math.max(13, R*0.58)}px -apple-system,"PingFang SC",sans-serif`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(Math.floor(c.u), x, y + R * 0.18);
+
+      if (c.type === 'n') {
+        ctx.fillStyle = '#f1f5fb'; ctx.font = `600 ${Math.max(13, R*0.58)}px -apple-system,"PingFang SC",sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(Math.floor(c.u), x, y);
+      } else {
+        ctx.strokeStyle = 'rgba(255,255,255,.6)'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (c.type === 'f') { ctx.arc(x, y, R*0.58, 0, Math.PI*2); ctx.arc(x, y, R*0.34, 0, Math.PI*2); }
+        else {
+          const sp = 8, ro = R*0.66, ri = R*0.44;
+          for (let i = 0; i < sp*2; i++) {
+            const ang = Math.PI/sp*i - Math.PI/2, rad = i % 2 ? ri : ro;
+            const px = x + Math.cos(ang)*rad, py = y + Math.sin(ang)*rad;
+            i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+          }
+          ctx.closePath();
+        }
+        ctx.stroke();
+        // 充能环
+        if (c.u > 0) {
+          ctx.beginPath();
+          ctx.arc(x, y, R*0.95, -Math.PI/2, -Math.PI/2 + Math.PI*2*Math.min(1, c.u/POWER_MAX));
+          ctx.strokeStyle = col; ctx.lineWidth = 4; ctx.stroke();
+        }
+      }
+
+      if (c.fat !== -1) {
+        ctx.beginPath(); ctx.arc(x, y, R + 6, 0, Math.PI*2);
+        ctx.strokeStyle = c.fat === 1 ? '#f59e0b' : '#fb923c'; ctx.lineWidth = 4; ctx.stroke();
+      }
+      if (c.antibody) {
+        ctx.beginPath(); ctx.arc(x, y, R + 12, 0, Math.PI*2);
+        ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 3; ctx.setLineDash([6,6]); ctx.stroke(); ctx.setLineDash([]);
+      }
     }
 
-    for (const f of fleets) {
-      ctx.beginPath(); ctx.arc(f.x, f.y, 7, 0, Math.PI*2);
-      ctx.fillStyle = f.own === 1 ? '#60a5fa' : '#f87171'; ctx.fill();
+    for (const f of units) {
+      const col = f.side === 1 ? '#60a5fa' : '#f87171';
+      ctx.beginPath();
+      if (f.kind === 'w') ctx.arc(f.x, f.y, 7, 0, Math.PI*2);
+      else if (f.kind === 'f') ctx.arc(f.x, f.y, 10, 0, Math.PI*2);
+      else { ctx.arc(f.x, f.y, 9, 0, Math.PI*2); }
+      ctx.fillStyle = col; ctx.fill();
+      if (f.kind !== 'w') { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke(); }
       ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.font = '600 11px sans-serif';
-      ctx.textAlign = 'center'; ctx.fillText(f.n, f.x, f.y - 12);
+      ctx.textAlign = 'center'; ctx.fillText(f.kind === 'w' ? f.n : (f.kind === 'f' ? '脂' : '抗'), f.x, f.y - 14);
     }
 
     if (drag) {

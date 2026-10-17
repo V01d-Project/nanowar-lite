@@ -1,0 +1,9 @@
+# 原版反向工程产物（只在本机，不入库）
+Nano_War_2.swf
+nw2.raw
+as3/
+ffdec*
+lib/
+flashlib/
+*.zip
+shot*.png
