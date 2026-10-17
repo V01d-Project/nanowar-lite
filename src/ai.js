@@ -5,7 +5,7 @@ const dist=(a,b)=>Math.trunc(Math.hypot(a.x-b.x,a.y-b.y)),asc=a=>a.slice().sort(
 // FrameTimer.as:11,31-34 quantizes milliseconds at the original25fps.
 function create(options={}){const ms=options.timeDecision||5000,interval=Math.trunc(ms/1000*25)/Core.FPS;return {timer:1+interval,interval,timeDecision:ms,mode:options.mode||'normal',side:options.side||2,turn:0};}
 // Select an existing opponent, never the bot itself or an eliminated default side.
-function weakestSide(s,side){const powers=Core.powerBySide(s),foes=[1,2,3,4].filter(n=>n!==side&&s.cells.some(c=>c.own===n));return foes.sort((a,b)=>powers[a]-powers[b])[0];}
+function weakestSide(s,side){const powers=Core.powerBySide(s),foes=[1,2,3,4].filter(n=>n!==side&&s.cells.some(c=>c.own===n));if(s.difficulty>=4&&side!==1&&foes.includes(1))return 1;return foes.sort((a,b)=>{const wa=powers[a]*(s.difficulty>=3&&a===1?0.6:1),wb=powers[b]*(s.difficulty>=3&&b===1?0.6:1);return wa-wb;})[0];}
 function fireSpecials(s,side){let sent=0;for(const c of s.cells.filter(c=>c.own===side&&c.ready&&c.type!=='n')){
  const targets=s.cells.filter(t=>t!==c&&(c.type!=='f'||t.type==='n'));
  let useful;if(c.type==='f')useful=targets.filter(t=>t.own!==side&&t.own!==0&&(t.antibody||t.fat!==side));
@@ -73,5 +73,5 @@ function idleFallback(s,brain,side,before){
  if(target&&Core.sendFleet(s,[source.id],target.id,side,50))brain.idle=0;
 }
 function think(s,brain,dt,side=brain.side){if(s.over||brain.stopped)return;brain.timer-=dt;if(brain.timer>1e-9)return;brain.turn++;if(!s.cells.some(c=>c.own===side)&&!s.units.some(u=>u.side===side)&&!s.minis.some(m=>m.side===side&&m.mode!=='bounce')){brain.timer+=brain.interval;return;}const before=s.nextUnit;if(brain.mode==='normal'){brain.interval=Math.trunc(brain.timeDecision/1000*25)/Core.FPS;decision(s,side);}else{brain.interval=Math.trunc((brain.timeDecision+Core.random(s)*1000)/1000*25)/Core.FPS;simpleDecision(s,brain,side);}idleFallback(s,brain,side,before);brain.timer+=brain.interval;}
-return {create,think,decision,simpleDecision};
+return {create,think,decision,simpleDecision,weakestSide};
 });

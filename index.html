@@ -30,8 +30,8 @@
 <h3>战役升级</h3>
 <p>本版开局默认发放 89 点；买四项各 4 级，刷新不保留，买完点「应用并重开」。</p>
 <h3>难度</h3>
-<p>普通 / 进阶（敌兵 ×1.5）/ 专家（×2）。难度不改 AI 选目标：它先打总兵力最弱的一方。</p>
+<p>普通 / 进阶（敌兵 ×1.5）/ 专家（×2）只改数值。大师把玩家的威胁按 0.6 折算，AI 优先打你；恶意则所有 AI 无条件集火你。</p>
 <button id="help-close">知道了</button></dialog>
 <div id="msg" role="dialog" aria-modal="true" aria-labelledby="mtitle" hidden><div class="card"><h1 id="mtitle"></h1><p id="msub"></p><button id="again">再来一局</button> <button id="next">下一关</button></div></div>
-<dialog id="upgrade-panel"><h2>战役升级 · <span id="points">0</span> 点</h2><p>已默认发放原版全部非教学关卡 × 三个难度的通关升级点；重复通关不重复发点。刷新不保留。购买后应用并重开。</p><label>开局难度<select id="difficulty"><option value="0">普通</option><option value="1">进阶 · 敌兵 ×1.5</option><option value="2">专家 · 敌兵 ×2</option></select></label><label>飞行速度<button id="buy-speed" type="button"></button></label><label>产兵时间<button id="buy-time" type="button"></button></label><label>脂肪防护<button id="buy-shield" type="button"></button></label><label>特殊能耗<button id="buy-special" type="button"></button></label><button id="apply">应用并重开</button></dialog>
+<dialog id="upgrade-panel"><h2>战役升级 · <span id="points">0</span> 点</h2><p>已默认发放原版全部非教学关卡 × 三个难度的通关升级点；重复通关不重复发点。刷新不保留。购买后应用并重开。</p><label>开局难度<select id="difficulty"><option value="0">普通</option><option value="1">进阶 · 敌兵 ×1.5</option><option value="2">专家 · 敌兵 ×2</option><option value="3">大师 · 敌兵 ×2 · 优先打你</option><option value="4">恶意 · 敌兵 ×2 · 集火你</option></select></label><label>飞行速度<button id="buy-speed" type="button"></button></label><label>产兵时间<button id="buy-time" type="button"></button></label><label>脂肪防护<button id="buy-shield" type="button"></button></label><label>特殊能耗<button id="buy-special" type="button"></button></label><button id="apply">应用并重开</button></dialog>
 </body></html>

@@ -7,6 +7,6 @@ function rewardTable(){const out={};for(const k of Object.keys(Levels.levels)){c
 function create(options){const pregrant=!options||options.pregrant!==false;const completed={},table=rewardTable();let points=0;if(pregrant)for(const id in table){completed[id]=true;points+=table[id];}return {points,upgrades:{speed:0,time:0,shield:0,special:0},completed};}
 function cost(c,key){if(!keys.includes(key)||c.upgrades[key]>=4)return null;return Core.UPGRADES[key+'Upg'][c.upgrades[key]+1];}
 function buy(c,key){const price=cost(c,key);if(price===null||c.points<price)return false;c.points-=price;c.upgrades[key]++;return true;}
-function award(c,level,difficulty){const d=Levels.levels[level],id=level+':'+difficulty;if(!level||!d||c.completed[id])return 0;c.completed[id]=true;const reward=tutorials.includes(level)?0:d.enemyUpgrades[difficulty].reward;c.points+=reward;return reward;}
+function award(c,level,difficulty){const d=Levels.levels[level],id=level+':'+difficulty;if(!level||!d||c.completed[id])return 0;c.completed[id]=true;const row=d.enemyUpgrades&&(d.enemyUpgrades[difficulty]||d.enemyUpgrades[2]);const reward=tutorials.includes(level)||!row?0:Number(row.reward)||0;c.points+=reward;return reward;}
 return {create,cost,buy,award,tutorials};
 });
