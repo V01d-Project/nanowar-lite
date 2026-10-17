@@ -1,23 +1,10 @@
 <!doctype html>
-<html lang="zh">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#0b1220">
-<title>细胞战争 Lite</title>
-<link rel="stylesheet" href="src/style.css">
-<script defer src="src/core.js"></script>
-<script defer src="src/ai.js"></script>
-<script defer src="src/render.js"></script>
-<script defer src="src/input.js"></script>
-<script defer src="src/app.js"></script>
-</head>
-<body>
-<main id="wrap"><canvas id="c" aria-label="细胞战争战场：选择蓝色普通细胞，点击目标派出一半兵力"></canvas></main>
-<header class="hud"><div class="pill">你 <b id="pCount">60</b></div><div class="pill" id="tip">圈选 · 派兵 50%</div><div class="pill">AI <b id="eCount">60</b></div></header>
-<div class="hint">点选 / 圈选蓝色普通细胞 → 点目标派兵<br>特殊细胞只能充能 · 消灭敌方普通细胞获胜</div>
-<div class="legend"><span>青环：充能</span><span>金环：发射倒计时</span></div>
-<nav class="bottom"><button id="restart">重开</button><button id="speed">速度 x1</button></nav>
-<div id="msg" role="dialog" aria-modal="true" aria-labelledby="mtitle" hidden><div class="card"><h1 id="mtitle"></h1><p id="msub"></p><button id="again">再来一局</button></div></div>
-</body>
-</html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#091322"><meta name="nanowar-build" content="as3-port-20261017"><title>Nano War · 源码规则版</title><link rel="stylesheet" href="src/style.css">
+<script defer src="src/core.js"></script><script defer src="src/levels.js"></script><script defer src="src/ai.js"></script><script defer src="src/render.js"></script><script defer src="src/input.js"></script><script defer src="src/app.js"></script></head>
+<body><main id="wrap"><canvas id="c" aria-label="Nano War 战场，点选或圈选蓝色细胞，再点目标派兵"></canvas></main>
+<header class="hud"><div class="pill blue">我方 <b id="pCount">0</b></div><div class="brand"><strong>NANO WAR</strong><small id="tip">关卡 1 / 3</small></div><div class="pill red">敌方 <b id="eCount">0</b></div></header><div id="status"></div>
+<section class="hint">点选 / 框选 / 圈选蓝色细胞 → 点目标，或直接拖到目标<br>特殊细胞：充能 → 读条 → 就绪后手动发射</section><div class="legend"><span>青环：能量</span><span>金环：准备进度</span></div>
+<nav class="bottom"><div class="row"><select id="level" aria-label="选择关卡"><option value="1">01 · 初次接触</option><option value="2">02 · 扩张</option><option value="3">03 · 联合出击</option><option value="0">机制沙盒（含 AI）</option></select><button id="percent">派兵 50%</button><button id="upgrade">升级</button></div><div class="row"><button id="restart">重开</button><button id="pause">暂停</button><button id="speed">速度 ×1</button></div></nav>
+<div id="msg" role="dialog" aria-modal="true" aria-labelledby="mtitle" hidden><div class="card"><h1 id="mtitle"></h1><p id="msub"></p><button id="again">再来一局</button> <button id="next">下一关</button></div></div>
+<dialog id="upgrade-panel"><h2>规则实验 · 升级等级</h2><p>原版 0–4 级数值。应用后重开；尚未实现战役点数购买。</p><label>开局难度<select id="difficulty"><option value="0">普通</option><option value="1">进阶 · 敌兵 ×1.5</option><option value="2">专家 · 敌兵 ×2</option></select></label><label>飞行速度<select id="upg-speed"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></label><label>产兵时间<select id="upg-time"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></label><label>脂肪防护<select id="upg-shield"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></label><label>特殊能耗<select id="upg-special"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></label><button id="apply">应用并重开</button></dialog>
+</body></html>

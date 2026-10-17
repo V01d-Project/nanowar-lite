@@ -1,23 +1,13 @@
-/* Composition root: clock, lifecycle and DOM HUD only. */
+/* Composition root: DOM and scheduling live here, never in core/AI. */
 (function(){'use strict';
-const Core=NanoCore,canvas=document.getElementById('c');
-const renderer=NanoRender.create(canvas);let state=Core.createState(),brain=NanoAI.create(),speed=1,last=performance.now();
-const ui=NanoInput.create(canvas,renderer,()=>state);
-function reset(){state=Core.createState();brain=NanoAI.create();ui.reset();last=performance.now();document.getElementById('msg').hidden=true;render();}
-function render(){
- for(const id of ui.selected)if(!Core.selectable(state.cells[id],1))ui.selected.delete(id);
- for(const side of [1,2])document.getElementById(side===1?'pCount':'eCount').textContent=state.cells.filter(c=>c.own===side).reduce((s,c)=>s+Math.floor(c.u),0);
- if(state.over){document.getElementById('msg').hidden=false;document.getElementById('mtitle').textContent=state.over===1?'赢了':state.over===2?'输了':'平局';document.getElementById('msub').textContent='敌我普通细胞与在途普通兵决定胜负；特殊细胞不计入。';}
- renderer.draw(state,ui);
-}
-const app={get state(){return state;},ui,renderer,reset,render,paused:false};window.NanoApp=app;
-function frame(now){const dt=Core.clampFrame((now-last)/1000);last=now;
- if(!document.hidden&&!app.paused&&!state.over){let remaining=dt*speed;while(remaining>1e-9){const d=Math.min(.05,remaining);Core.step(state,d);NanoAI.think(state,brain,d);remaining-=d;}}
- render();requestAnimationFrame(frame);
-}
-window.addEventListener('resize',()=>{ui.reset();renderer.resize();render();});
-document.addEventListener('visibilitychange',()=>{last=performance.now();ui.drag=null;});
-document.getElementById('restart').onclick=reset;document.getElementById('again').onclick=reset;
-document.getElementById('speed').onclick=e=>{speed=speed===3?1:speed+1;e.target.textContent='速度 x'+speed;};
+const C=NanoCore,canvas=document.getElementById('c'),renderer=NanoRender.create(canvas),$=id=>document.getElementById(id);let level=1,state,brains=[],speed=1,last=performance.now();
+const ui=NanoInput.create(canvas,renderer,()=>state);ui.percent=50;
+function reset(){state=NanoLevels.create(level,{difficulty:Number($('difficulty').value),upgrades:{1:readUpgrades()}});brains=state.ai.map(NanoAI.create);ui.reset();last=performance.now();$('msg').hidden=true;render();}
+function readUpgrades(){return Object.fromEntries(['speed','time','shield','special'].map(k=>[k,Number($('upg-'+k).value)]));}
+function render(){for(const id of ui.selected)if(!C.selectable(state.cells[id],1))ui.selected.delete(id);const p=C.powerBySide(state);$('pCount').textContent=p[1];$('eCount').textContent=p.slice(2).reduce((a,b)=>a+b,0);$('tip').textContent=level?('关卡 '+level+' / 3'):'机制沙盒';$('status').textContent=NanoLevels.levels[level].name+' · '+Math.floor(state.time)+'s'+(app.paused?' · 已暂停':'');if(state.over){$('msg').hidden=false;$('mtitle').textContent=state.over===1?'战场已掌控':'细胞已失守';$('msub').textContent='胜负统计所有细胞与在途兵力。';$('next').hidden=state.over!==1||level===0||level===3;}renderer.draw(state,ui);}
+const app={get state(){return state;},ui,renderer,reset,render,paused:false,setLevel(n){level=n;$('level').value=n;reset();}};window.NanoApp=app;
+function frame(now){const dt=C.clampFrame((now-last)/1000);last=now;if(!document.hidden&&!app.paused&&!state.over){let left=dt*speed;while(left>1e-9){const d=Math.min(.05,left);C.step(state,d);for(const b of brains)NanoAI.think(state,b,d);left-=d;}}render();requestAnimationFrame(frame);}
+window.addEventListener('resize',()=>{ui.reset();renderer.resize();render();});document.addEventListener('visibilitychange',()=>{last=performance.now();ui.drag=null;});
+$('restart').onclick=reset;$('again').onclick=reset;$('next').onclick=()=>app.setLevel(Math.min(3,level+1));$('level').onchange=e=>app.setLevel(Number(e.target.value));$('speed').onclick=e=>{speed=speed===2?1:2;e.target.textContent='速度 ×'+speed;};$('pause').onclick=()=>{app.paused=!app.paused;$('pause').textContent=app.paused?'继续':'暂停';};$('percent').onclick=e=>{ui.percent=ui.percent===100?25:ui.percent===25?50:ui.percent===50?75:100;e.target.textContent='派兵 '+ui.percent+'%';};$('upgrade').onclick=()=>$('upgrade-panel').showModal();$('apply').onclick=()=>{$('upgrade-panel').close();reset();};document.addEventListener('keydown',e=>{if(e.key==='Escape')app.paused=!app.paused;if(e.code==='Space'){e.preventDefault();ui.selected.clear();}if(e.key==='a')for(const c of state.cells)if(C.selectable(c,1))ui.selected.add(c.id);});
 reset();document.documentElement.dataset.ready='true';requestAnimationFrame(frame);
 })();

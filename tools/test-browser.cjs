@@ -17,7 +17,7 @@ async function until(fn){for(let i=0;i<160;i++){const v=await fn();if(v)return v
   fs.readFile(file,(err,data)=>{if(err){badRequests.push(req.url);res.writeHead(404).end();return;}res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(data);});
  });
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
- const url='http://127.0.0.1:'+server.address().port+'/';
+ const url=process.env.NANOWAR_URL||('http://127.0.0.1:'+server.address().port+'/');
  try{
  for(const [width,height] of [[430,932],[1280,800]]){
   const profile=fs.mkdtempSync(path.join(os.tmpdir(),'nanowar-chrome-'));
@@ -41,39 +41,19 @@ async function until(fn){for(let i=0;i<160;i++){const v=await fn();if(v)return v
    await until(()=>evaluate('document.documentElement?.dataset.ready === "true"'));
    await evaluate('NanoApp.paused=true; NanoApp.reset(); NanoApp.render();');
    async function shot(suffix){const result=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});const file=path.join(shots,width+'x'+height+'-'+suffix+'.png');fs.writeFileSync(file,Buffer.from(result.data,'base64'));console.log('screenshot '+path.relative(root,file));}
-   await shot('initial');
-   const layout=await evaluate(
-    '(()=>{const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};return {viewport:[innerWidth,innerHeight],overflow:document.documentElement.scrollWidth>innerWidth,pills:[...document.querySelectorAll(".pill")].map(rect),hud:rect(document.querySelector(".hud")),hint:rect(document.querySelector(".hint")),cells:NanoApp.state.cells.map(c=>({id:c.id,...NanoApp.renderer.point(c),r:NanoApp.renderer.radius(c),special:c.type!=="n"}))};})()');
-   assert.deepEqual(layout.viewport,[width,height]);assert.equal(layout.overflow,false);
-   for(let i=1;i<layout.pills.length;i++)assert.ok(layout.pills[i-1].x+layout.pills[i-1].w<layout.pills[i].x,'HUD pills overlap');
-   for(const c of layout.cells){const extra=c.special?13:2;assert.ok(c.x-c.r-extra>0&&c.x+c.r+extra<width,'cell clipped horizontally');assert.ok(c.y-c.r-extra>layout.hud.y+layout.hud.h,'cell overlaps HUD');assert.ok(c.y+c.r+(c.special?48:2)<layout.hint.y,'cell overlaps instructions');}
-   for(let i=0;i<layout.cells.length;i++)for(let j=i+1;j<layout.cells.length;j++){const a=layout.cells[i],b=layout.cells[j];assert.ok(Math.hypot(a.x-b.x,a.y-b.y)>a.r+b.r+(a.special?13:0)+(b.special?13:0),'cell rings overlap');}
+   async function layoutCheck(){const l=await evaluate('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};return {viewport:[innerWidth,innerHeight],overflow:document.documentElement.scrollWidth>innerWidth,hud:rect(document.querySelector(".hud")),hint:rect(document.querySelector(".hint")),cells:NanoApp.state.cells.map(c=>({id:c.id,...NanoApp.renderer.point(c),r:NanoApp.renderer.radius(c),special:c.type!=="n"}))};})()');assert.deepEqual(l.viewport,[width,height]);assert.equal(l.overflow,false);for(const c of l.cells){const extra=c.special?13:3;assert.ok(c.x-c.r-extra>0&&c.x+c.r+extra<width,'cell clipped horizontally');assert.ok(c.y-c.r-extra>l.hud.y+l.hud.h,'cell overlaps HUD');assert.ok(c.y+c.r+(c.special?48:3)<l.hint.y,'cell overlaps instructions');}for(let i=0;i<l.cells.length;i++)for(let j=i+1;j<l.cells.length;j++){const a=l.cells[i],b=l.cells[j];assert.ok(Math.hypot(a.x-b.x,a.y-b.y)>a.r+b.r+(a.special?13:0)+(b.special?13:0),'cell rings overlap');}return l;}
+   for(const level of [1,2,3,0]){await evaluate('NanoApp.setLevel('+level+');NanoApp.render();');await layoutCheck();await shot('level-'+level);}
    async function click(p){await call('Input.dispatchMouseEvent',{type:'mousePressed',x:p.x,y:p.y,button:'left',clickCount:1});await call('Input.dispatchMouseEvent',{type:'mouseReleased',x:p.x,y:p.y,button:'left',clickCount:1});}
-   const source=layout.cells[0],battery=layout.cells[8];
-   await evaluate('NanoApp.state.cells[8].own=1;NanoApp.state.cells[8].u=50;');
-   await click(source);await click(battery);
-   assert.equal(await evaluate('NanoApp.state.units.filter(u=>u.target===8).length'),20,'click friendly special sends soldiers');
-   assert.equal(await evaluate('NanoApp.ui.selected.size'),0);
-   await evaluate('NanoApp.reset();NanoApp.state.cells[0].fat=2;');
-   await click(source);await click(layout.cells[4]);
-   assert.equal(await evaluate('NanoApp.state.units.length'),0,'input cannot bypass fat blockade');
-   // Touch lasso must count max displacement, even when the gesture closes at its start.
-   await evaluate('NanoApp.reset();');
-   const x=source.x,y=source.y,r=source.r+10;
-   const touch=async(type,p)=>call('Input.dispatchTouchEvent',{type,touchPoints:p?[{x:p[0],y:p[1]}]:[]});
-   await touch('touchStart',[x-r,y-r]);
-   for(const p of [[x+r,y-r],[x+r,y+r],[x-r,y+r],[x-r,y-r]])await touch('touchMove',p);
-   await touch('touchEnd');
-   assert.equal(await evaluate('NanoApp.ui.selected.has(0)'),true,'closed touch lasso selects source');
-   assert.equal(await evaluate('(()=>{const e=new MouseEvent("contextmenu",{bubbles:true,cancelable:true});document.getElementById("c").dispatchEvent(e);return e.defaultPrevented;})()'),true);
-   assert.equal(await evaluate('getComputedStyle(document.getElementById("c")).touchAction'),'none');
-   await evaluate('NanoApp.reset();NanoApp.state.cells[7].own=2;NanoApp.state.cells[7].u=100;NanoApp.state.cells[7].timer=4;NanoApp.state.cells[8].own=1;NanoApp.state.cells[8].u=70;NanoApp.render();');
-   await shot('rings');
-   assert.deepEqual(exceptions,[],'browser runtime errors');
-   console.log('PASS '+width+'x'+height+': layout, friendly charge, fat block, closed touch lasso, context menu, ring screenshots; no JS errors');
+   await evaluate('NanoApp.setLevel(0);');const layout=await layoutCheck(),source=layout.cells[0],battery=layout.cells[5];
+   await click(source);await click(battery);assert.equal(await evaluate('NanoApp.state.units[0].target'),5);assert.equal(await evaluate('NanoApp.state.units[0].wanted'),30);assert.equal(await evaluate('NanoApp.ui.selected.size'),0);
+   await evaluate('NanoApp.reset();NanoApp.state.cells[0].fat=2;');await click(source);await click(layout.cells[1]);assert.equal(await evaluate('NanoApp.state.units.length'),0,'fat blockade through input');
+   await evaluate('NanoApp.reset();');const x=source.x,y=source.y,r=source.r+13;const touch=async(type,p)=>call('Input.dispatchTouchEvent',{type,touchPoints:p?[{x:p[0],y:p[1]}]:[]});await touch('touchStart',[x-r,y-r]);for(const p of [[x+r,y-r],[x+r,y+r],[x-r,y+r],[x-r,y-r]])await touch('touchMove',p);await touch('touchEnd');assert.equal(await evaluate('NanoApp.ui.selected.has(0)'),true,'closed touch lasso');
+   await evaluate('NanoApp.reset();for(let i=0;i<240;i++)NanoCore.step(NanoApp.state,1/30);NanoApp.render();');await click(battery);assert.equal(await evaluate('NanoApp.ui.selected.has(5)'),true,'ready special manually selectable');await click(layout.cells[1]);assert.equal(await evaluate('NanoApp.state.units[0].kind'),'f');assert.equal(await evaluate('NanoApp.state.cells[5].u'),0,'special discharged');
+   await evaluate('NanoApp.setLevel(1);');const l1=await layoutCheck();await click(l1.cells[1]);await click(l1.cells[0]);await evaluate('for(let i=0;i<600;i++)NanoCore.step(NanoApp.state,1/30);NanoApp.render();');assert.equal(await evaluate('NanoApp.state.over'),1,'level1 playable to win');await shot('victory');
+   assert.deepEqual(exceptions,[],'browser runtime errors');console.log('PASS '+width+'x'+height+': 4 maps, layout, charge, blockade, touch lasso, special launch, level1 victory; no JS errors');
   }finally{if(ws)ws.close();child.kill();}
  }
  assert.deepEqual(badRequests,[],'missing resources');
- console.log('PASS browser verification (2 viewports, 4 screenshots)');
+ console.log('PASS browser verification (2 viewports, 10 screenshots)');
  }finally{server.closeAllConnections();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

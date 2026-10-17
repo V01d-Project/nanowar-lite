@@ -1,28 +1,38 @@
-/* AI issues the same validated orders as the player; no private rule mutations. */
+/* Behavior reconstruction of ai/AI.as and ai/Normal.as. No DOM or private mutations. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./core.js'));else root.NanoAI=factory(root.NanoCore);})(globalThis,function(Core){
 'use strict';
-function create(){return {timer:0,turn:0};}
-function think(state,brain,dt,side=2){
-  if(state.over)return;
-  brain.timer-=dt;if(brain.timer>0)return;brain.timer=1.1;brain.turn++;
-  const incoming=(c,s)=>state.units.filter(u=>u.kind==='w'&&u.target===c.id&&u.side===s).length;
-  const sources=state.cells.filter(c=>Core.canSend(c,side)&&c.u>=12).sort((a,b)=>b.u-a.u);
-  if(!sources.length)return;
-  // Defend normal AND special cells, accounting for reinforcements already on the way.
-  const threatened=state.cells.filter(c=>c.own===side&&incoming(c,3-side)>c.u+incoming(c,side)-4)
-    .sort((a,b)=>incoming(b,3-side)-b.u-(incoming(a,3-side)-a.u));
-  for(const target of threatened){const src=sources.find(c=>c.id!==target.id);if(src){Core.sendFleet(state,[src.id],target.id,side);return;}}
-  const src=sources[0];
-  // Regularly invest in friendly batteries (including after their automatic discharge).
-  const batteries=state.cells.filter(c=>c.type!=='n'&&c.own===side&&c.u+incoming(c,side)<Core.MAX);
-  if(batteries.length&&(brain.turn%3===0||src.u>=65)){
-    batteries.sort((a,b)=>Math.hypot(a.x-src.x,a.y-src.y)-Math.hypot(b.x-src.x,b.y-src.y));
-    Core.sendFleet(state,[src.id],batteries[0].id,side);return;
-  }
-  const targets=state.cells.filter(c=>c.own!==side&&!c.antibody&&Math.floor(src.u*.5)>c.u-incoming(c,side)+1);
-  targets.sort((a,b)=>score(a)-score(b));
-  function score(c){return Math.hypot(c.x-src.x,c.y-src.y)*55+c.u-(c.type!=='n'?16:0);}
-  if(targets.length)Core.sendFleet(state,[src.id],targets[0].id,side);
+const dist=(a,b)=>Math.trunc(Math.hypot(a.x-b.x,a.y-b.y)),asc=a=>a.slice().sort((a,b)=>a.u-b.u),desc=a=>asc(a).reverse();
+// FrameTimer.as:11,31-34 uses25fps to compute frame counts, even on requested30fps mode.
+function create(options={}){const ms=options.timeDecision||5000,interval=Math.trunc(ms/1000*25)/Core.FPS;return {timer:1+interval,interval,timeDecision:ms,mode:'normal',side:options.side||2,turn:0};}
+function decision(s,side=2){
+ const white=s.cells.filter(c=>c.type==='n'),own=white.filter(c=>c.own===side),foes=white /* AI.as:258-272: cellsSide(side,false) also includes friendly cells */,fat=s.cells.filter(c=>c.type==='f'),ab=s.cells.filter(c=>c.type==='a');
+ const strongest=desc(own),a=strongest[0],b=strongest[1];if(!a)return;
+ const p=Core.powerBySide(s);let weakSide=1,least=p[1];for(let i=1;i<p.length;i++)if(p[i]<least&&p[i]>0&&i!==side){least=p[i];weakSide=i;}
+ const enemies=asc(white.filter(c=>c.own===weakSide)),weak=enemies[0],enemy=enemies[enemies.length-1];
+ const nearest=(from,list)=>list.slice().sort((x,y)=>dist(from,x)-dist(from,y))[0];
+ const neutral=white.filter(c=>c.own===0).sort((x,y)=>dist(a,x)-dist(a,y)).slice(0,3),weakNeutral=asc(neutral)[0],big=own.slice().sort((x,y)=>y.size-x.size)[0];
+ const myFat=desc(fat.filter(c=>c.own===side))[0],myAb=desc(ab.filter(c=>c.own===side))[0],nearFat=nearest(a,asc(fat)),nearAb=nearest(a,ab),strongFoe=desc(foes)[0];
+ const attack=(from,to,percent=50)=>from&&to?Core.sendFleet(s,[from.id],to.id,side,percent):0;
+ // Normal.as:58-167: preserve ordering, including the original truthy power*3 condition.
+ if(weak&&p[weakSide]*7<own.reduce((n,c)=>n+c.u,0)&&!weak.antibody)attack(a,weak,100);
+ else if(!weak)attack(a,s.cells.find(c=>c.own===weakSide));
+ else if(big.u<15&&big.size>=60&&!big.antibody)attack(a,big);
+ else if(b&&weakNeutral&&weakNeutral.u*4<a.u+b.u&&weakNeutral.fat!==-1&&!weakNeutral.antibody){attack(a,weakNeutral,100);attack(b,weakNeutral,100);}
+ else if(myAb&&myAb.ready&&enemy&&enemy.fat===-1&&enemy.u>50)attack(myAb,strongFoe);
+ else if(myAb&&!myAb.ready&&big.u>=30)attack(big,myAb);
+ else if(myAb&&myAb.ready&&!big.antibody&&big.size>=60)attack(myAb,big);
+ else if(!myAb&&b&&b.u+a.u>=80&&ab.length&&own.length>1){attack(a,nearAb,80);attack(b,nearAb,80);}
+ else if(myFat&&enemy&&myFat.ready&&enemy.fat!==side&&enemy.u>50)attack(myFat,enemy);
+ else if(myFat&&enemy&&myFat.ready&&enemy.fat!==side)attack(myFat,enemy);
+ else if(myFat&&myFat.ready&&big.u>=30&&big.fat!==side)attack(myFat,big);
+ else if(b&&a.u+b.u>weak.u*1.2&&dist(a,weak)<250&&weak.fat===-1&&!weak.antibody){attack(a,weak,80);attack(b,weak,80);}
+ else if(weak.u<25&&weak.fat===side)attack(a,weak);
+ else if(!myFat&&b&&b.u+a.u>=80&&fat.length&&own.length>1){attack(a,nearFat,80);attack(b,nearFat,80);}
+ else if(myFat&&own.length>1&&myFat.u<myFat.powerMax&&a.u>30)attack(a,myFat);
+ else if(a.u*3&&dist(a,weak)<250&&weak.fat===-1&&!weak.antibody)attack(a,weak,75);
+ else if(a.u>=40&&s.cells.filter(c=>c.own===side).length===1)attack(a,asc(foes)[0]);
+ else if(neutral.length&&dist(a,neutral[0])<300){for(const c of neutral)if(a.u/1.5>c.u&&dist(a,c)<350&&c.fat===-1){attack(a,c,85);break;}}
 }
-return {create,think};
+function think(s,brain,dt,side=brain.side){if(s.over||brain.stopped)return;brain.timer-=dt;if(brain.timer>1e-9)return;brain.timer+=brain.interval;brain.turn++;if(Core.powerBySide(s)[side]===0){brain.stopped=true;return;}decision(s,side);}
+return {create,think,decision};
 });
