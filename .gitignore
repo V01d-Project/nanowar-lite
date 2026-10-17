@@ -8,6 +8,9 @@ flashlib/
 *.zip
 shot*.png
 
+# Local simulation reports and one-off diagnostic helpers
+/tmp/
+
 # doc artifacts
 CHANGELOG.md
 Icon.icns

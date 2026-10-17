@@ -4,10 +4,20 @@
 const dist=(a,b)=>Math.trunc(Math.hypot(a.x-b.x,a.y-b.y)),asc=a=>a.slice().sort((a,b)=>a.u-b.u),desc=a=>asc(a).reverse();
 // FrameTimer.as:11,31-34 quantizes milliseconds at the original25fps.
 function create(options={}){const ms=options.timeDecision||5000,interval=Math.trunc(ms/1000*25)/Core.FPS;return {timer:1+interval,interval,timeDecision:ms,mode:options.mode||'normal',side:options.side||2,turn:0};}
+// Select an existing opponent, never the bot itself or an eliminated default side.
+function weakestSide(s,side){const powers=Core.powerBySide(s),foes=[1,2,3,4].filter(n=>n!==side&&s.cells.some(c=>c.own===n));return foes.sort((a,b)=>powers[a]-powers[b])[0];}
+function fireSpecials(s,side){let sent=0;for(const c of s.cells.filter(c=>c.own===side&&c.ready&&c.type!=='n')){
+ const targets=s.cells.filter(t=>t!==c&&(c.type!=='f'||t.type==='n'));
+ let useful;if(c.type==='f')useful=targets.filter(t=>t.own!==side&&t.own!==0&&(t.antibody||t.fat!==side));
+ else useful=targets.filter(t=>t.own!==side&&(t.fat===-1||t.fat===side));
+ if(!useful.length)useful=targets.filter(t=>t.own===side&&(c.type==='f'?t.fat!==side:!t.antibody)&&(c.type==='f'||t.fat===-1||t.fat===side));
+ const target=useful.sort((a,b)=>Number(b.antibody)-Number(a.antibody)||b.u-a.u||dist(c,a)-dist(c,b))[0];if(target)sent+=Core.sendFleet(s,[c.id],target.id,side);
+ }return sent;}
 function decision(s,side=2){
+ if(fireSpecials(s,side))return;
  const white=s.cells.filter(c=>c.type==='n'),own=white.filter(c=>c.own===side),foes=white /* AI.as:258-272: cellsSide(side,false) also includes friendly cells */,fat=s.cells.filter(c=>c.type==='f'),ab=s.cells.filter(c=>c.type==='a');
  const strongest=desc(own),a=strongest[0],b=strongest[1];if(!a)return;
- const p=Core.powerBySide(s);let weakSide=1,least=p[1];for(let i=1;i<p.length;i++)if(p[i]<least&&p[i]>0&&i!==side){least=p[i];weakSide=i;}
+ const p=Core.powerBySide(s),weakSide=weakestSide(s,side);
  const enemies=asc(white.filter(c=>c.own===weakSide)),weak=enemies[0],enemy=enemies[enemies.length-1];
  const nearest=(from,list)=>list.slice().sort((x,y)=>dist(from,x)-dist(from,y))[0];
  const neutral=white.filter(c=>c.own===0).sort((x,y)=>dist(a,x)-dist(a,y)).slice(0,3),weakNeutral=asc(neutral)[0],big=own.slice().sort((x,y)=>y.size-x.size)[0];
@@ -35,12 +45,13 @@ function decision(s,side=2){
 }
 // Easy.as:15-77, Noob.as:17-40, TutorialFat.as:15-26.
 function simpleDecision(s,brain,side){
+ if(brain.mode!=='base'&&fireSpecials(s,side))return;
  const white=s.cells.filter(c=>c.type==='n'),own=white.filter(c=>c.own===side),a=desc(own)[0],b=desc(own)[1];if(!a)return;
  const attack=(from,to,pct=50)=>from&&to?Core.sendFleet(s,[from.id],to.id,side,pct):0,total=Core.powerBySide(s)[side],near=(from,list)=>list.slice().sort((x,y)=>dist(from,x)-dist(from,y))[0];
- if(brain.mode==='noob'){if(total>15){const targets=[...white.filter(c=>c.own===0),...white.filter(c=>c.own===1),...white.filter(c=>c.own===2)].filter(c=>dist(a,c)<250);attack(a,targets[Math.floor(Core.random(s)*targets.length)]);}return;}
+ if(brain.mode==='noob'){if(total>15){const foes=s.cells.filter(c=>c.own!==side&&(c.type==='n'||c.own>0)),from=desc(own).find(c=>Core.canSend(c,side)&&foes.some(t=>dist(c,t)<250));if(from){const targets=foes.filter(c=>dist(from,c)<250);attack(from,targets[Math.floor(Core.random(s)*targets.length)]);}}return;}
  if(brain.mode==='tutorialfat'){const target=white[0];Core.random(s);if(target&&total>=target.u&&total>50)attack(own[0],target);return;}
  if(brain.mode==='base')return;
- const powers=Core.powerBySide(s);let sideWeak=1,least=powers[1];for(let i=1;i<powers.length;i++)if(powers[i]<least&&powers[i]>0&&i!==side){least=powers[i];sideWeak=i;}
+ const sideWeak=weakestSide(s,side);
  const enemy=asc(white.filter(c=>c.own===sideWeak)),weak=enemy[0],strong=enemy[enemy.length-1],fat=s.cells.filter(c=>c.type==='f'),myFat=desc(fat.filter(c=>c.own===side))[0],nearFat=near(a,asc(fat)),neutral=white.filter(c=>c.own===0).sort((x,y)=>dist(a,x)-dist(a,y)).slice(0,3);
  if(!weak){attack(a,nearFat);return;}
  if(weak.u<25&&weak.fat===side)attack(a,weak);
@@ -51,6 +62,16 @@ function simpleDecision(s,brain,side){
  else if(neutral.length&&dist(a,neutral[0])<250){for(const c of neutral)if(a.u/2.1>c.u&&dist(a,c)<250){attack(a,c);break;}}
  else if(total*4>weak.u&&dist(a,weak)<350){attack(a,weak);attack(b,weak);}
 }
-function think(s,brain,dt,side=brain.side){if(s.over||brain.stopped)return;brain.timer-=dt;if(brain.timer>1e-9)return;brain.turn++;if(Core.powerBySide(s)[side]===0){brain.stopped=true;return;}if(brain.mode==='normal'){brain.interval=Math.trunc(brain.timeDecision/1000*25)/Core.FPS;decision(s,side);}else{brain.interval=Math.trunc((brain.timeDecision+Core.random(s)*1000)/1000*25)/Core.FPS;simpleDecision(s,brain,side);}brain.timer+=brain.interval;}
+// Original priorities can all miss (e.g. level4: two allies, foe >250px away).
+// After two idle decisions, use another legal source/target rather than sleep forever.
+function idleFallback(s,brain,side,before){
+ if(brain.mode!=='normal'&&brain.mode!=='easy')return;
+ brain.idle=s.nextUnit===before?(brain.idle||0)+1:0;if(brain.idle<2)return;
+ const source=desc(s.cells.filter(c=>c.type==='n'&&c.u>=40&&Core.canSend(c,side)))[0];if(!source)return;
+ const targets=s.cells.filter(c=>c.own!==side&&c!==source&&(c.own===0||!c.antibody));
+ const target=targets.sort((a,b)=>Number(a.own!==0)-Number(b.own!==0)||dist(source,a)-dist(source,b))[0];
+ if(target&&Core.sendFleet(s,[source.id],target.id,side,50))brain.idle=0;
+}
+function think(s,brain,dt,side=brain.side){if(s.over||brain.stopped)return;brain.timer-=dt;if(brain.timer>1e-9)return;brain.turn++;if(!s.cells.some(c=>c.own===side)&&!s.units.some(u=>u.side===side)&&!s.minis.some(m=>m.side===side&&m.mode!=='bounce')){brain.timer+=brain.interval;return;}const before=s.nextUnit;if(brain.mode==='normal'){brain.interval=Math.trunc(brain.timeDecision/1000*25)/Core.FPS;decision(s,side);}else{brain.interval=Math.trunc((brain.timeDecision+Core.random(s)*1000)/1000*25)/Core.FPS;simpleDecision(s,brain,side);}idleFallback(s,brain,side,before);brain.timer+=brain.interval;}
 return {create,think,decision,simpleDecision};
 });

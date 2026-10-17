@@ -26,8 +26,9 @@ async function until(fn){for(let i=0;i<160;i++){const v=await fn();if(v)return v
   const child=spawn(chrome,args,{stdio:['ignore','ignore','pipe'],windowsHide:true});
   let ws;
   try{
-   const portFile=path.join(profile,'DevToolsActivePort');await until(()=>fs.existsSync(portFile));
-   const port=fs.readFileSync(portFile,'utf8').split('\n')[0];
+   const portFile=path.join(profile,'DevToolsActivePort');
+   // Chrome briefly locks this file on Windows after creating it.
+   const port=await until(()=>{try{const p=Number(fs.readFileSync(portFile,'utf8').split('\n')[0]);return p>0?p:false;}catch(e){if(['ENOENT','EBUSY','EACCES'].includes(e.code))return false;throw e;}});
    const pages=await (await fetch('http://127.0.0.1:'+port+'/json/list')).json();
    ws=new WebSocket(pages.find(p=>p.type==='page').webSocketDebuggerUrl);
    await new Promise((r,j)=>{ws.addEventListener('open',r,{once:true});ws.addEventListener('error',j,{once:true});});
@@ -48,12 +49,12 @@ async function until(fn){for(let i=0;i<160;i++){const v=await fn();if(v)return v
    await click(source);await click(battery);assert.equal(await evaluate('NanoApp.state.units[0].target'),5);assert.equal(await evaluate('NanoApp.state.units[0].wanted'),30);assert.equal(await evaluate('NanoApp.ui.selected.size'),0);
    await evaluate('NanoApp.reset();NanoApp.state.cells[0].fat=2;');await click(source);await click(layout.cells[1]);assert.equal(await evaluate('NanoApp.state.units.length'),0,'fat blockade through input');
    await evaluate('NanoApp.reset();');const x=source.x,y=source.y,r=source.r+13;const touch=async(type,p)=>call('Input.dispatchTouchEvent',{type,touchPoints:p?[{x:p[0],y:p[1]}]:[]});await touch('touchStart',[x-r,y-r]);for(const p of [[x+r,y-r],[x+r,y+r],[x-r,y+r],[x-r,y-r]])await touch('touchMove',p);await touch('touchEnd');assert.equal(await evaluate('NanoApp.ui.selected.has(0)'),true,'closed touch lasso');
-   await evaluate('NanoApp.reset();for(let i=0;i<240;i++)NanoCore.step(NanoApp.state,1/25);NanoApp.render();');assert.equal(await evaluate('NanoApp.state.cells[5].ready'),true,'ready after240frames '+JSON.stringify(await evaluate('NanoApp.state.cells[5]')));await click(battery);assert.equal(await evaluate('NanoApp.ui.selected.has(5)'),true,'ready special manually selectable '+JSON.stringify(await evaluate('({selected:[...NanoApp.ui.selected],cell:NanoApp.state.cells[5]})')));await click(layout.cells[1]);assert.equal(await evaluate('NanoApp.state.units[0].kind'),'f');assert.equal(await evaluate('NanoApp.state.cells[5].u'),0,'special discharged');
+   await evaluate('NanoApp.reset();for(let i=0;i<240;i++)NanoCore.step(NanoApp.state,1/25);NanoApp.render();');assert.equal(await evaluate('NanoApp.state.cells[5].ready'),true,'ready after240frames '+JSON.stringify(await evaluate('NanoApp.state.cells[5]')));await click(battery);assert.equal(await evaluate('NanoApp.ui.selected.has(5)'),true,'ready special manually selectable '+JSON.stringify(await evaluate('({selected:[...NanoApp.ui.selected],cell:NanoApp.state.cells[5]})')));await shot('special-ready-selected');await click(layout.cells[1]);assert.equal(await evaluate('NanoApp.state.units[0].kind'),'f');assert.equal(await evaluate('NanoApp.state.cells[5].u'),0,'special discharged');
    await evaluate('NanoApp.setLevel(1);');const l1=await layoutCheck();await click(l1.cells[1]);await click(l1.cells[0]);await evaluate('for(let i=0;i<600;i++)NanoCore.step(NanoApp.state,1/25);NanoApp.render();');assert.equal(await evaluate('NanoApp.state.over'),1,'level1 playable to win');await shot('victory');
    assert.deepEqual(exceptions,[],'browser runtime errors');console.log('PASS '+width+'x'+height+': 26 maps, layout, charge, blockade, touch lasso, special launch, level1 victory; no JS errors');
   }finally{if(ws)ws.close();child.kill();}
  }
  assert.deepEqual(badRequests,[],'missing resources');
- console.log('PASS browser verification (2 viewports, 16 screenshots)');
+ console.log('PASS browser verification (2 viewports, 18 screenshots)');
  }finally{server.closeAllConnections();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

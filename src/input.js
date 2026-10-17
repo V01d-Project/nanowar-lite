@@ -3,7 +3,8 @@
 window.NanoInput={create(canvas,renderer,getState){
  const ui={selected:new Set(),drag:null,percent:50};
  const point=e=>{const r=canvas.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};};
- const hit=p=>getState().cells.slice().reverse().find(c=>{const q=renderer.point(c);return Math.hypot(p.x-q.x,p.y-q.y)<=renderer.radius(c)+7;});
+ // Prefer an actual cell body over another cell's enlarged touch halo.
+ const hit=p=>getState().cells.map(c=>{const q=renderer.point(c),r=Math.max(1,renderer.radius(c)),d=Math.hypot(p.x-q.x,p.y-q.y);return {c,d,r,body:d<=r};}).filter(h=>h.d<=h.r+7).sort((a,b)=>Number(b.body)-Number(a.body)||a.d/a.r-b.d/b.r||a.c.id-b.c.id)[0]?.c;
  function inside(p,pts){let yes=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const a=pts[i],b=pts[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)yes=!yes;}return yes;}
  canvas.addEventListener('pointerdown',e=>{
   if(getState().over||ui.drag||!e.isPrimary||e.button!==0)return;e.preventDefault();canvas.setPointerCapture(e.pointerId);
@@ -12,7 +13,7 @@ window.NanoInput={create(canvas,renderer,getState){
  canvas.addEventListener('pointermove',e=>{const d=ui.drag;if(!d||d.pointerId!==e.pointerId)return;e.preventDefault();const p=point(e);d.end=p;d.moved=Math.max(d.moved,Math.hypot(p.x-d.start.x,p.y-d.start.y));const last=d.path[d.path.length-1];if(Math.hypot(p.x-last.x,p.y-last.y)>5)d.path.push(p);});
  canvas.addEventListener('pointerup',e=>{
   const d=ui.drag;if(!d||d.pointerId!==e.pointerId)return;e.preventDefault();ui.drag=null;
-  const state=getState(),p=point(e);d.end=p;
+  const state=getState(),p=point(e);d.end=p;d.moved=Math.max(d.moved,Math.hypot(p.x-d.start.x,p.y-d.start.y));
   if(d.moved<10){
    const c=hit(p);if(!c){ui.selected.clear();return;}
    // Unready friendly batteries accept charge; ready batteries can be selected as sources.

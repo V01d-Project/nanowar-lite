@@ -18,11 +18,11 @@ function createState(map,options={}){
  c.ray=c.type==='n'?Math.floor(44*c.size/100*.83):24;
  c.interval=Math.trunc(1000+2200*(100-c.size)/100)/1000;c.delay=c.interval;
  if(s.difficulty&&c.own>1&&c.type==='n')c.u=Math.trunc(c.u*(s.difficulty===1?1.5:2));
- sync(c);return c;});return s;
+ setPower(c,c.u);return c;});return s;
 }
 function sync(c){c.ray2=c.type==='n'?Math.trunc(c.ray*clamp(.5+c.u/200,.5,1.1)*.95):15;if(c.type!=='n'){if(c.u<c.powerMax){c.timer=0;c.loading=false;c.ready=false;}else if(!c.ready&&!c.loading){c.loading=true;c.timer=0;}}}
-function setPower(c,p){c.u=Math.max(0,Math.trunc(p));sync(c);}
-function switchSide(c,side,s){if(c.own!==side){if(c.type==='n'&&c.own===0)c.u+=Math.trunc(25*c.size/100);if(c.type!=='n'){c.ready=false;sync(c);}if(side!==c.fat)c.fat=-1;c.own=side;c.upgrades=Object.assign({speed:0,time:0,shield:0,special:0},s&&s.upgrades[side]);c.powerMax=c.type==='n'?100:100*upgrade(c,'special');}sync(c);}
+function setPower(c,p){c.u=Number.isFinite(p)?Math.max(0,Math.trunc(p)):0;sync(c);}
+function switchSide(c,side,s){if(c.own!==side){if(c.type==='n'&&c.own===0)c.u+=Math.trunc(25*c.size/100);if(c.type!=='n'){c.ready=false;c.loading=false;c.timer=0;}if(side!==c.fat)c.fat=-1;c.own=side;c.upgrades=Object.assign({speed:0,time:0,shield:0,special:0},s&&s.upgrades[side]);c.powerMax=c.type==='n'?100:100*upgrade(c,'special');}sync(c);}
 function selectable(c,side){return !!c&&c.own===side&&(c.type==='n'||c.ready);}
 function canSend(c,side){return selectable(c,side)&&(c.type!=='n'||((c.fat===-1||c.fat===side)&&c.u>=2));}
 // Cell.as:373-410. Zero becomes neutral first; next hostile mini captures with one energy.
@@ -36,7 +36,7 @@ function unitPower(u,p){u.power=p;if(u.kind==='w'){u.scale=clamp(.25+.75*p/100,.
 // FatUnit.as:13-19; AntibodyUnit.as:13-18; SpecialUnit.as:13: ray18.
 function launch(s,c,target,kind,power=0){const u={id:s.nextUnit++,kind,side:c.own,source:c.id,target:target.id,x:c.x,y:c.y,power:0,wanted:power,moving:kind!=='w',v:0,acc:true,angle:Math.atan2(target.y-c.y,target.x-c.x),bx:0,by:0,age:0,ray:18,vmax:kind==='f'?3:3.3,vmin:kind==='w'?.6:.8,acceleration:.5,slow:kind==='a'?.96:.94};
  if(kind==='w'){unitPower(u,0);u.x+=Math.cos(u.angle)*(c.ray2*.8-u.ray);u.y+=Math.sin(u.angle)*(c.ray2*.8-u.ray);}s.units.push(u);return u;}
-function sendFleet(s,ids,targetId,side,percent=50){const target=s.cells[targetId];if(!target||s.over||side<1||side>4)return 0;let count=0;for(const id of new Set(ids)){const c=s.cells[id];if(!canSend(c,side)||c===target)continue;if(c.type!=='n'){if(c.type==='f'&&target.type!=='n')continue;launch(s,c,target,c.type);c.ready=false;setPower(c,c.u-c.powerMax);count++;}else{let n=Math.trunc(c.u*clamp(percent,0,100)/100);count+=n;while(n>0){launch(s,c,target,'w',Math.min(100,n));n-=100;}}}return count;}
+function sendFleet(s,ids,targetId,side,percent=50){const target=s.cells[targetId];if(!target||s.over||!Number.isInteger(side)||side<1||side>4||!Number.isFinite(percent))return 0;let count=0;for(const id of new Set(ids)){const c=s.cells[id];if(!canSend(c,side)||c===target)continue;if(c.type!=='n'){if(c.type==='f'&&target.type!=='n')continue;launch(s,c,target,c.type);c.ready=false;setPower(c,c.u-c.powerMax);count++;}else{let n=Math.trunc(c.u*clamp(percent,0,100)/100);count+=n;while(n>0){launch(s,c,target,'w',Math.min(100,n));n-=100;}}}return count;}
 function growthInterval(c){return c.interval;} // WhiteBloodCell.as:57: fixed SIZE interpolation.
 function produce(c){if(c.own===0&&c.fat===-1)return;if(c.fat===-1||c.fat===c.own){if(c.u>100)c.u--;else if(c.u<100&&c.own!==0)c.u++;}else c.u--;c.u=clamp(Math.trunc(c.u),0,1000);sync(c);c.delay=Math.trunc(c.interval*1000/(c.antibody?1.5:1))/1000*(1-upgrade(c,'time'));}
 // Unit.as:18-20,326-333: bounce3.5, attenuation0.85; collision coefficient1.5.
@@ -48,7 +48,7 @@ function burst(s,u){for(let i=0;i<u.power;i++){const t=s.cells[u.target];let vx=
 // Unit.as:22,173-199,224-288,379-449: expiry60s and pulse movement, two acceleration additions.
 function tickUnit(s,u){const c=s.cells[u.source],t=s.cells[u.target];u.age+=FRAME;if(u.age>=60)return false;
  // WhiteBloodUnit.as:126-178: transfer ceil-ish integer thirds over frames, never instant debit.
- if(u.kind==='w'&&u.power<u.wanted&&!u.moving){if(c.u===0||u.side!==c.own){u.wanted=u.power;if(!u.power)return false;}let n=Math.max(1,Math.trunc((u.wanted-u.power)/3));n=Math.min(n,c.u);unitPower(u,u.power+n);setPower(c,c.u-n);if(u.power>=u.wanted||c.u===0){u.wanted=u.power;u.moving=true;const v=upgrade(c,'speed');u.vmax*=1+v;u.acceleration*=1+v;u.slow-=u.slow*v/3;}return true;}
+ if(u.kind==='w'&&u.power<u.wanted&&!u.moving){if(u.side===c.own&&c.fat!==-1&&c.fat!==u.side){setPower(c,c.u+u.power);return false;}if(c.u===0||u.side!==c.own){u.wanted=u.power;if(!u.power)return false;u.moving=true;return true;}let n=Math.max(1,Math.trunc((u.wanted-u.power)/3));n=Math.min(n,c.u);unitPower(u,u.power+n);setPower(c,c.u-n);if(u.power>=u.wanted||c.u===0){u.wanted=u.power;u.moving=true;const v=upgrade(c,'speed');u.vmax*=1+v;u.acceleration*=1+v;u.slow-=u.slow*v/3;}return true;}
  u.x+=u.bx;u.y+=u.by;u.bx*=.85;u.by*=.85;
  if(u.moving){u.v=clamp(u.v,0,u.vmax);if(u.acc)u.angle=Math.atan2(t.y-u.y,t.x-u.x);u.x+=Math.cos(u.angle)*u.v;u.y+=Math.sin(u.angle)*u.v;if(u.acc){u.v+=u.acceleration*2;if(u.v>=u.vmax-.1)u.acc=false;}else{u.v*=u.slow;if(u.v<=u.vmin){u.acc=true;u.angle=Math.atan2(t.y-u.y,t.x-u.x);}}}
  for(const other of s.cells){if(other===c)continue;const d=Math.trunc(Math.hypot(u.x-other.x,u.y-other.y));if(other===t){const hit=u.kind==='w'?d<u.ray+other.ray:d<2;if(hit){if(u.kind==='w')burst(s,u);else if(u.kind==='f')arriveFat(other,u.side);else arriveAb(other,u.side,s);return false;}if(u.kind!=='w'&&d<other.ray-u.ray/2)u.angle=Math.atan2(other.y-u.y,other.x-u.x);}else if(d<u.ray+other.ray){separate(u,other);if(other.fat!==-1&&other.fat!==u.side)bounce(u,other);}}
@@ -58,7 +58,7 @@ function collide(a,b){separate(a,b);separate(b,a);if(a.kind==='w'&&b.kind==='a'&
 function tickMini(s,m){const c=s.cells[m.target];if(m.mode==='home'){const a=Math.atan2(c.y-m.y,c.x-m.x);m.v=Math.min(10,m.v+1);m.vx=Math.cos(a)*m.v;m.vy=Math.sin(a)*m.v;const d=Math.trunc(Math.hypot(c.x-m.x,c.y-m.y));if(d<c.ray*1.2&&!m.hit){m.hit=true;if(shieldMini(c,m.side)){m.mode='bounce';const a=Math.atan2(c.y-m.y,c.x-m.x);m.x=c.x-Math.cos(a)*c.ray*1.2;m.y=c.y-Math.sin(a)*c.ray*1.2;m.vx=-Math.cos(a)*(2+random(s)*3);m.vy=-Math.sin(a)*(2+random(s)*3);m.side=0;}}if(m.mode!=='bounce'&&d<c.ray2){arriveWhite(c,m.side,s,false);return false;}}else if(m.mode==='bounce'){if(m.life--===0)return false;m.vx*=.83;m.vy*=.83;}else{m.vx*=.83;m.vy*=.83;if(m.vx<.5&&m.vy<.5)m.mode='home';}m.x+=m.vx;m.y+=m.vy;return true;}
 function powerBySide(s){const p=[0,0,0,0,0];for(const c of s.cells)p[c.own]+=c.u;for(const u of s.units)p[u.side]+=u.power;return p;}
 // Game.as:1986-2044: ALL cell types count, and wait for minis; unlike previous Lite.
-function winner(s){const p=powerBySide(s),n=[0,0,0,0,0];for(const c of s.cells)n[c.own]++;if(!p[1]&&!n[1]&&!s.minis.some(m=>m.side===1&&m.mode!=='bounce'))return 2;const alive=[1,2,3,4].filter(side=>p[side]>0||n[side]>0);return alive.length===1&&alive[0]===1&&p[1]>0&&s.minis.length===0?1:0;}
+function winner(s){const alive=new Set(s.cells.filter(c=>c.own).map(c=>c.own));for(const u of s.units)if(u.side)alive.add(u.side);for(const m of s.minis)if(m.side&&m.mode!=='bounce')alive.add(m.side);if(!alive.has(1))return 2;return alive.size===1&&s.units.length===0&&s.minis.length===0?1:0;}
 function tick(s){s.time+=FRAME;for(const c of s.cells){sync(c);if(c.type==='n'){c.growth+=FRAME;if(c.growth+EPS>=c.delay){c.growth-=c.delay;produce(c);}}else if(c.loading){c.timer+=FRAME;if(c.timer+EPS>=LOAD[c.type]){c.timer=LOAD[c.type];c.loading=false;c.ready=true;}}}s.units=s.units.filter(u=>tickUnit(s,u));for(let i=0;i<s.units.length;i++)for(let j=i+1;j<s.units.length;j++){const a=s.units[i],b=s.units[j];if(Math.trunc(Math.hypot(a.x-b.x,a.y-b.y))<a.ray+b.ray)collide(a,b);}s.minis=s.minis.filter(m=>tickMini(s,m));s.over=winner(s);}
 function clampFrame(dt){return Number.isFinite(dt)?clamp(dt,0,.05):0;}
 function step(s,seconds){if(s.over)return;s.accumulator+=clampFrame(seconds);while(s.accumulator+EPS>=FRAME&&!s.over){s.accumulator-=FRAME;tick(s);}}
