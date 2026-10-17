@@ -24,7 +24,7 @@ function sync(c){c.ray2=c.type==='n'?Math.trunc(c.ray*clamp(.5+c.u/200,.5,1.1)*.
 function setPower(c,p){c.u=Number.isFinite(p)?Math.max(0,Math.trunc(p)):0;sync(c);}
 function switchSide(c,side,s){if(c.own!==side){if(c.type==='n'&&c.own===0)c.u+=Math.trunc(25*c.size/100);if(c.type!=='n'){c.ready=false;c.loading=false;c.timer=0;}if(side!==c.fat)c.fat=-1;c.own=side;c.upgrades=Object.assign({speed:0,time:0,shield:0,special:0},s&&s.upgrades[side]);c.powerMax=c.type==='n'?100:100*upgrade(c,'special');}sync(c);}
 function selectable(c,side){return !!c&&c.own===side&&(c.type==='n'||c.ready);}
-function canSend(c,side){return selectable(c,side)&&(c.type!=='n'||((c.fat===-1||c.fat===side)&&c.u>=2));}
+function canSend(c,side){return selectable(c,side)&&(c.fat===-1||c.fat===side)&&(c.type!=='n'||c.u>=2);}
 // Cell.as:373-410. Zero becomes neutral first; next hostile mini captures with one energy.
 function shieldMini(c,side){c.hits++;if(c.hits<upgrade(c,'shield')*10&&side!==c.fat&&c.fat!==-1)return true;c.hits=0;return false;}
 function arriveWhite(c,side,s,checkShield=true){if(checkShield&&shieldMini(c,side))return false;let p=c.u+(side===c.own||c.antibody?1:-1),owner=c.own;if(p===0)owner=0;else if(p<0){p=Math.abs(p);owner=side;}switchSide(c,owner,s);setPower(c,p);return true;}
