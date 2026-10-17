@@ -1,0 +1,14 @@
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0b1220;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Microsoft YaHei","PingFang SC",sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#wrap{position:fixed;inset:0;touch-action:none}
+canvas{display:block;width:100%;height:100%;touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.hud{position:fixed;inset:0 0 auto;display:flex;justify-content:space-between;align-items:center;padding:calc(env(safe-area-inset-top) + 12px) 14px 10px;color:#cfd6e4;font-size:13px;pointer-events:none;z-index:5;gap:8px}
+.hud b{font-size:17px}.pill{background:#ffffff0d;border:1px solid #ffffff1a;border-radius:999px;padding:7px 12px;white-space:nowrap}
+.bottom{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(env(safe-area-inset-bottom) + 12px);display:flex;gap:12px;justify-content:center;z-index:5}
+button{appearance:none;border:1px solid #ffffff29;background:#ffffff0f;color:#e6ebf5;font:inherit;font-size:14px;padding:10px 22px;border-radius:12px;touch-action:manipulation}
+button:active{transform:scale(.97)}button:focus-visible{outline:2px solid #fbbf24}
+.hint{position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 96px);color:#91a1b9;font-size:11px;text-align:center;pointer-events:none;line-height:1.8}
+.legend{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 69px);display:flex;justify-content:center;gap:18px;font-size:11px;color:#fbbf24;pointer-events:none}.legend span:first-child{color:#22d3ee}
+#msg:not([hidden]){position:fixed;inset:0;display:grid;place-items:center;background:#060a12cc;z-index:9;color:#f1f5fb}
+.card{text-align:center;margin:20px;padding:28px;border-radius:18px;background:#121a2b;border:1px solid #ffffff1a;max-width:360px}.card h1{margin:0 0 10px;font-size:26px}.card p{color:#9aa6bd;font-size:13px;line-height:1.7}
+@media(max-height:580px){.hint{font-size:10px;bottom:86px}.legend{bottom:62px}.hud{padding-top:8px}}

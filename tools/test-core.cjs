@@ -1,0 +1,34 @@
+'use strict';
+const assert=require('node:assert/strict');
+const C=require('../src/core.js'),AI=require('../src/ai.js');
+let passed=0;
+function test(name,fn){try{fn();passed++;console.log('ok '+passed+' - '+name);}catch(e){console.error('FAIL - '+name);throw e;}}
+const cell=(opts={})=>C.createState([opts]).cells[0];
+const state=(extra=[])=>C.createState([{own:1,u:40,x:0,y:0},{own:2,u:40,x:1,y:1},...extra]);
+function run(s,seconds){for(let t=0;t<seconds-1e-8;t+=.05)C.step(s,Math.min(.05,seconds-t));}
+test('normal production intervals are 3.2s empty and 1.0s full',()=>{assert.equal(C.growthInterval(cell({u:0})),3.2);assert.ok(Math.abs(C.growthInterval(cell({u:100}))-1)<1e-9);});
+test('normal production is discrete and capped at 100',()=>{const s=state();s.cells[0].u=0;run(s,3.15);assert.equal(s.cells[0].u,0);run(s,.05);assert.equal(s.cells[0].u,1);s.cells[0].u=99;run(s,1.05);assert.equal(s.cells[0].u,100);run(s,10);assert.equal(s.cells[0].u,100);});
+test('neutral and special cells never passively produce',()=>{const s=state([{u:12},{type:'f',own:1,u:45}]);run(s,4);assert.equal(s.cells[2].u,12);assert.equal(s.cells[3].u,45);assert.equal(s.cells[3].timer,0);});
+for(const [type,seconds] of [['f',8],['a',12]])test(type+' full battery waits exact load duration then fires/reset',()=>{const s=state([{type,own:1,u:100,x:.2,y:.2}]);run(s,seconds-.05);assert.equal(s.units.length,0);assert.ok(s.cells[2].timer>seconds-.1);run(s,.05);assert.equal(s.units.length,1);assert.equal(s.units[0].kind,type);assert.equal(s.units[0].target,1);assert.equal(s.cells[2].u,0);assert.equal(s.cells[2].timer,0);});
+test('incomplete charge never starts countdown',()=>{const s=state([{type:'a',own:1,u:99}]);run(s,13);assert.equal(s.cells[2].timer,0);assert.equal(s.units.length,0);});
+test('fat applies shield, same side retains it, other side removes it',()=>{const c=cell({own:2});C.arriveFat(c,1);assert.equal(c.fat,1);C.arriveFat(c,1);assert.equal(c.fat,1);C.arriveFat(c,2);assert.equal(c.fat,-1);});
+test('fat removes antibody before applying shield (even on same-side target)',()=>{const c=cell({own:1,antibody:true});C.arriveFat(c,1);assert.equal(c.antibody,false);assert.equal(c.fat,-1);C.arriveFat(c,1);assert.equal(c.fat,1);});
+test('fat cannot hit or target special cells',()=>{const c=cell({type:'a',own:2});assert.equal(C.arriveFat(c,1),false);assert.equal(c.fat,-1);const s=state([{type:'f',own:1,u:100,x:.9,y:.9},{type:'a',own:2,x:.89,y:.89}]);C.spawnSpecial(s,s.cells[2]);assert.equal(s.units[0].target,1);});
+test('antibody infects and preserves normal energy',()=>{const c=cell({own:2,u:37});C.arriveAb(c,1);assert.equal(c.own,1);assert.equal(c.u,37);assert.equal(c.antibody,true);});
+test('hostile fat blocks infection; compatible fat survives infection',()=>{const c=cell({own:2,u:37,fat:2});assert.equal(C.arriveAb(c,1),false);assert.equal(c.own,2);c.fat=1;assert.equal(C.arriveAb(c,1),true);assert.equal(c.fat,1);assert.equal(c.u,37);});
+test('antibody absorbs exactly one energy per ordinary soldier, capped at 100',()=>{const c=cell({own:2,u:37,antibody:true});C.arriveWhite(c,1,50);assert.equal(c.u,38);assert.equal(c.own,2);for(let i=0;i<100;i++)C.arriveWhite(c,1);assert.equal(c.u,100);});
+test('hostile fat prevents departure without consuming energy',()=>{const s=state();s.cells[0].fat=2;assert.equal(C.sendFleet(s,[0],1,1),0);assert.equal(s.cells[0].u,40);s.cells[0].fat=1;assert.equal(C.sendFleet(s,[0],1,1),20);});
+test('friendly special batteries accept reinforcement but cannot be selected or sent',()=>{const s=state([{type:'a',own:1,u:45}]);assert.equal(C.selectable(s.cells[2],1),false);assert.equal(C.sendFleet(s,[2],1,1),0);assert.equal(C.sendFleet(s,[0],2,1),20);assert.ok(s.units.every(u=>u.target===2&&u.kind==='w'));C.arriveWhite(s.cells[2],1);assert.equal(s.cells[2].u,46);});
+test('normal fleets are individual staggered soldiers, no multi-soldier impacts',()=>{const s=state();C.sendFleet(s,[0],1,1);assert.equal(s.units.length,20);assert.equal(s.units[0].t,0);assert.ok(s.units[19].t<0);assert.ok(s.units.every(u=>!('n' in u)));});
+test('capture of special resets battery and load (ordinary and antibody)',()=>{const c=cell({type:'a',own:2,u:0,timer:7});C.arriveWhite(c,1);assert.equal(c.own,1);assert.equal(c.u,0);assert.equal(c.timer,0);c.own=2;c.u=100;c.timer=7;C.arriveAb(c,1);assert.equal(c.own,1);assert.equal(c.u,0);assert.equal(c.timer,0);});
+test('ordinary loss of special energy cancels countdown',()=>{const c=cell({type:'f',own:2,u:100,timer:4});C.arriveWhite(c,1);assert.equal(c.u,99);assert.equal(c.timer,0);});
+test('neutral or enemy special cells never prevent normal-base victory',()=>{const s=C.createState([{type:'n',own:1},{type:'f',own:0},{type:'a',own:2}]);assert.equal(C.winner(s),1);s.cells[0].own=2;assert.equal(C.winner(s),2);s.cells[0].own=0;assert.equal(C.winner(s),3);});
+test('in-flight ordinary soldiers delay elimination until resolved',()=>{const s=state();C.sendFleet(s,[1],0,2);s.cells[1].own=1;assert.equal(C.winner(s),0);s.units=[];assert.equal(C.winner(s),1);});
+test('self orders, duplicate sources and wrong-side sources are safe',()=>{const s=state();assert.equal(C.sendFleet(s,[0],0,1),0);assert.equal(C.sendFleet(s,[1],0,1),0);assert.equal(C.sendFleet(s,[0,0],1,1),20);assert.equal(s.cells[0].u,20);});
+test('background dt, negative dt and NaN are bounded',()=>{assert.equal(C.clampFrame(60),.05);assert.equal(C.clampFrame(-1),0);assert.equal(C.clampFrame(NaN),0);const s=state();C.step(s,60);assert.equal(s.time,.05);});
+test('AI charges friendly special cells through public orders',()=>{const s=state([{type:'a',own:2,u:50,x:.8,y:.8}]);const b=AI.create();b.turn=2;AI.think(s,b,.05);assert.ok(s.units.some(u=>u.target===2&&u.side===2));});
+test('AI captures neutral special cells',()=>{const s=state([{type:'f',own:0,u:0,x:.99,y:.99}]);AI.think(s,AI.create(),.05);assert.ok(s.units.some(u=>u.target===2));});
+test('AI reinforces threatened friendly special cells',()=>{const s=state([{type:'a',own:2,u:0,x:.8,y:.8}]);C.sendFleet(s,[0],2,1);AI.think(s,AI.create(),.05);assert.ok(s.units.some(u=>u.target===2&&u.side===2));});
+test('AI cannot bypass hostile fat blockade',()=>{const s=state();s.cells[1].fat=1;AI.think(s,AI.create(),.05);assert.equal(s.units.length,0);});
+test('simulation is deterministic across repeated 120s runs',()=>{function simulate(){const s=C.createState(),b=AI.create();for(let i=0;i<2400;i++){C.step(s,.05);AI.think(s,b,.05);}return s;}assert.deepEqual(simulate(),simulate());});
+console.log('\nPASS '+passed+'/'+passed+' core + AI tests (0 dependencies)');
