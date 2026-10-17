@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#0b1220">
 <title>细胞战争 Lite</title>
 <style>
-  :root{ --p:#3b82f6; --e:#ef4444; --n:#8b93a7; }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:#0b1220;overflow:hidden;
     font-family:-apple-system,BlinkMacSystemFont,"Microsoft YaHei","PingFang SC",sans-serif;
@@ -27,21 +26,21 @@
   #msg h1{margin:0 0 8px;font-size:26px}
   #msg p{margin:0 0 18px;color:#9aa6bd;font-size:14px}
   .hint{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 64px);text-align:center;
-    color:#7b869c;font-size:12px;pointer-events:none;z-index:4;transition:opacity .5s}
+    color:#7b869c;font-size:12px;pointer-events:none;z-index:4;transition:opacity .5s;line-height:1.6}
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="c"></canvas></div>
 <div class="hud">
   <div class="pill">你 <b id="pCount">0</b></div>
-  <div class="pill" id="tip">拖框 / 圈选细胞</div>
+  <div class="pill" id="tip">圈选 · 派兵</div>
   <div class="pill">AI <b id="eCount">0</b></div>
 </div>
 <div class="bottom">
   <button id="restart">重开</button>
   <button id="speed">速度 x1</button>
 </div>
-<div class="hint" id="hint">手机：手指画圈选中自己的细胞，再点目标细胞出兵</div>
+<div class="hint" id="hint">圈选自己的细胞 → 点目标出兵 50%<br>普通克盾 · 盾克刺 · 刺克普通</div>
 <div id="msg"><div class="card"><h1 id="mtitle"></h1><p id="msub"></p><button id="again">再来一局</button></div></div>
 <script>
 (() => {
@@ -50,32 +49,32 @@
   let W = 0, H = 0, DPR = 1;
   let speedMul = 1;
 
-  // 归一化地图：12 个细胞
+  // type: 0 普通 · 1 盾 · 2 刺   (普通克盾, 盾克刺, 刺克普通)
   const MAP = [
-    // 玩家
-    { x:0.16, y:0.80, own:1, u:30, g:1.0,  r:0.070 },
-    { x:0.30, y:0.90, own:1, u:18, g:0.8,  r:0.055 },
-    // AI
-    { x:0.84, y:0.20, own:2, u:30, g:1.0,  r:0.070 },
-    { x:0.70, y:0.10, own:2, u:18, g:0.8,  r:0.055 },
-    // 中立
-    { x:0.50, y:0.50, own:0, u:26, g:0.6,  r:0.075 },
-    { x:0.34, y:0.58, own:0, u:14, g:0.4,  r:0.050 },
-    { x:0.66, y:0.42, own:0, u:14, g:0.4,  r:0.050 },
-    { x:0.50, y:0.30, own:0, u:12, g:0.3,  r:0.045 },
-    { x:0.50, y:0.70, own:0, u:12, g:0.3,  r:0.045 },
-    { x:0.22, y:0.34, own:0, u:10, g:0.3,  r:0.042 },
-    { x:0.78, y:0.66, own:0, u:10, g:0.3,  r:0.042 },
-    { x:0.50, y:0.50, own:0, u:0,  g:0,    r:0 }
-  ].filter(c => c.r > 0);
+    { x:0.16, y:0.80, own:1, u:30, g:1.0, r:0.070, t:0 },
+    { x:0.30, y:0.90, own:1, u:18, g:0.8, r:0.055, t:1 },
+    { x:0.84, y:0.20, own:2, u:30, g:1.0, r:0.070, t:0 },
+    { x:0.70, y:0.10, own:2, u:18, g:0.8, r:0.055, t:2 },
+    { x:0.50, y:0.50, own:0, u:26, g:0.6, r:0.075, t:1 },
+    { x:0.34, y:0.58, own:0, u:14, g:0.4, r:0.050, t:2 },
+    { x:0.66, y:0.42, own:0, u:14, g:0.4, r:0.050, t:0 },
+    { x:0.50, y:0.30, own:0, u:12, g:0.3, r:0.045, t:1 },
+    { x:0.50, y:0.70, own:0, u:12, g:0.3, r:0.045, t:2 },
+    { x:0.22, y:0.34, own:0, u:10, g:0.3, r:0.042, t:2 },
+    { x:0.78, y:0.66, own:0, u:10, g:0.3, r:0.042, t:1 }
+  ];
 
   let cells = [], fleets = [], selected = new Set();
-  let drag = null;          // {x0,y0,x1,y1,type:'box'|'lasso',path:[]}
-  let over = 0;             // 0 进行中 1 胜 2 负
-  let aiTimer = 0;
+  let drag = null, over = 0, aiTimer = 0;
 
   const CAP = 100;
-  const TRAVEL = 160; // 像素/秒，原版节奏偏慢
+  const TRAVEL = 160;      // px/s
+  const ADV = 1.35;        // 克制方倍率
+  const DIS = 0.72;        // 被克方倍率
+
+  const beats = (a, b) => (a === 0 && b === 1) || (a === 1 && b === 2) || (a === 2 && b === 0);
+  const mult = (atk, def) => atk === def ? 1 : (beats(atk, def) ? ADV : DIS);
+
   const padX = () => Math.max(26, W * 0.085);
   const padTop = () => Math.max(78, H * 0.085);
   const padBottom = () => Math.max(118, H * 0.14);
@@ -83,11 +82,11 @@
   const RAD = (c) => Math.min(c.r * Math.min(W, H) * 1.05, Math.min(W, H) * 0.13);
 
   function reset() {
-    cells = MAP.map((m, i) => ({ id:i, x:m.x, y:m.y, own:m.own, u:m.u, g:m.g, r:m.r }));
+    cells = MAP.map((m, i) => ({ id:i, x:m.x, y:m.y, own:m.own, u:m.u, g:m.g, r:m.r, t:m.t }));
     fleets = []; selected.clear(); over = 0; aiTimer = 0;
     document.getElementById('msg').style.display = 'none';
     document.getElementById('hint').style.opacity = 1;
-    setTimeout(() => document.getElementById('hint').style.opacity = 0, 6000);
+    setTimeout(() => document.getElementById('hint').style.opacity = 0, 7000);
     syncHud();
   }
 
@@ -107,7 +106,6 @@
   window.addEventListener('resize', resize);
   window.addEventListener('orientationchange', () => setTimeout(resize, 120));
 
-  // ---------- 输入 ----------
   function pos(e) { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
 
   function cellAt(x, y) {
@@ -159,23 +157,20 @@
       return;
     }
 
-    // 多选
     const picked = new Set();
     const rx0 = Math.min(d.x0, d.x1), rx1 = Math.max(d.x0, d.x1);
     const ry0 = Math.min(d.y0, d.y1), ry1 = Math.max(d.y0, d.y1);
     for (const c of cells) {
       if (c.own !== 1) continue;
       const [cx, cy] = PX(c);
-      if (d.type === 'lasso') {
-        if (inPoly(cx, cy, d.path)) picked.add(c.id);
-      } else if (cx >= rx0 && cx <= rx1 && cy >= ry0 && cy <= ry1) picked.add(c.id);
+      if (d.type === 'lasso') { if (inPoly(cx, cy, d.path)) picked.add(c.id); }
+      else if (cx >= rx0 && cx <= rx1 && cy >= ry0 && cy <= ry1) picked.add(c.id);
     }
     selected = picked;
   });
 
   cv.addEventListener('contextmenu', e => e.preventDefault());
 
-  // ---------- 逻辑 ----------
   function sendFleet(target) {
     if (!selected.size) return;
     let moved = false;
@@ -187,7 +182,7 @@
       c.u -= n;
       const [ax, ay] = PX(c), [bx, by] = PX(target);
       const dist = Math.hypot(bx - ax, by - ay);
-      fleets.push({ from:c.id, to:target.id, own:1, n, x:ax, y:ay, sx:ax, sy:ay,
+      fleets.push({ from:c.id, to:target.id, own:1, type:c.t, n, x:ax, y:ay, sx:ax, sy:ay,
         tx:bx, ty:by, t:0, dur: Math.max(0.9, dist / (TRAVEL * speedMul)) });
       moved = true;
     }
@@ -198,8 +193,9 @@
     const c = cells[f.to];
     if (!c) return;
     if (c.own === f.own) { c.u = Math.min(CAP, c.u + f.n); return; }
-    if (f.n > c.u) { c.own = f.own; c.u = f.n - c.u; }
-    else { c.u -= f.n; }
+    const power = f.n * mult(f.type, c.t);
+    if (power > c.u) { c.own = f.own; c.u = Math.min(CAP, power - c.u); }
+    else { c.u -= power; }
   }
 
   function aiThink(dt) {
@@ -208,10 +204,8 @@
     aiTimer = 1.1;
     const mine = cells.filter(c => c.own === 2 && c.u >= 12);
     if (!mine.length) return;
-    // 选兵力最多的一个
     mine.sort((a, b) => b.u - a.u);
     const src = mine[0];
-    // 找最近的非己方细胞
     let best = null, bd = 1e9;
     for (const c of cells) {
       if (c.own === 2) continue;
@@ -219,28 +213,27 @@
       if (d < bd) { bd = d; best = c; }
     }
     if (!best) return;
-    if (src.u > best.u * 1.15 + 4) {
+    const need = best.u / mult(src.t, best.t);
+    if (src.u > need * 1.12 + 4) {
       const n = Math.floor(src.u * 0.5);
       if (n < 1) return;
       src.u -= n;
       const [ax, ay] = PX(src), [bx, by] = PX(best);
-      fleets.push({ from:src.id, to:best.id, own:2, n, x:ax, y:ay, sx:ax, sy:ay, tx:bx, ty:by, t:0,
-        dur: Math.max(0.9, Math.hypot(bx - ax, by - ay) / TRAVEL) });
+      fleets.push({ from:src.id, to:best.id, own:2, type:src.t, n, x:ax, y:ay, sx:ax, sy:ay, tx:bx, ty:by, t:0,
+        dur: Math.max(0.9, Math.hypot(bx - ax, by - ay) / (TRAVEL * speedMul)) });
     }
   }
 
   function checkEnd() {
     const p = cells.some(c => c.own === 1), e = cells.some(c => c.own === 2);
-    if (!e) finish(1);
-    else if (!p) finish(2);
+    if (!e) finish(1); else if (!p) finish(2);
   }
 
   function finish(who) {
     over = who;
-    const m = document.getElementById('msg');
     document.getElementById('mtitle').textContent = who === 1 ? '赢了' : '输了';
     document.getElementById('msub').textContent = who === 1 ? '所有细胞都归你了' : 'AI 占了全图，再来一局';
-    m.style.display = 'grid';
+    document.getElementById('msg').style.display = 'grid';
   }
 
   let last = performance.now();
@@ -248,9 +241,7 @@
     const dt = Math.min(0.05, (now - last) / 1000) * speedMul;
     last = now;
     if (!over) {
-      for (const c of cells) {
-        if (c.own !== 0) c.u = Math.min(CAP, c.u + c.g * dt);
-      }
+      for (const c of cells) if (c.own !== 0) c.u = Math.min(CAP, c.u + c.g * dt);
       for (const f of fleets) {
         f.t += dt / f.dur;
         const k = Math.min(1, f.t);
@@ -259,24 +250,31 @@
       }
       const done = fleets.filter(f => f.t >= 1);
       if (done.length) { fleets = fleets.filter(f => f.t < 1); done.forEach(resolve); }
-      aiThink(dt);
-      checkEnd();
-      syncHud();
+      aiThink(dt); checkEnd(); syncHud();
     }
     draw();
     requestAnimationFrame(loop);
   }
 
-  // ---------- 绘制 ----------
+  function glyph(c, x, y, R) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,.55)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const s = R * 0.62;
+    if (c.t === 0) { ctx.arc(x, y - R * 0.42, s * 0.34, 0, Math.PI * 2); }
+    else if (c.t === 1) { ctx.rect(x - s * 0.30, y - R * 0.42 - s * 0.30, s * 0.60, s * 0.60); }
+    else { ctx.moveTo(x, y - R * 0.42 - s * 0.38); ctx.lineTo(x - s * 0.36, y - R * 0.42 + s * 0.26); ctx.lineTo(x + s * 0.36, y - R * 0.42 + s * 0.26); ctx.closePath(); }
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function draw() {
-    ctx.clearRect(0, 0, W, H);
-    // 背景网格
     ctx.fillStyle = '#0b1220'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = 'rgba(120,160,255,.05)'; ctx.lineWidth = 1;
     for (let x = 0; x < W; x += 48) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
     for (let y = 0; y < H; y += 48) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
-    // 连线
     ctx.strokeStyle = 'rgba(150,170,210,.10)';
     for (let i = 0; i < cells.length; i++) for (let j = i + 1; j < cells.length; j++) {
       const a = PX(cells[i]), b = PX(cells[j]);
@@ -285,7 +283,6 @@
       }
     }
 
-    // 细胞
     for (const c of cells) {
       const [x, y] = PX(c), R = RAD(c);
       const col = c.own === 1 ? '#3b82f6' : c.own === 2 ? '#ef4444' : '#8b93a7';
@@ -295,12 +292,12 @@
       ctx.lineWidth = selected.has(c.id) ? 4 : 2;
       ctx.strokeStyle = selected.has(c.id) ? '#fbbf24' : col;
       ctx.stroke();
-      ctx.fillStyle = '#f1f5fb'; ctx.font = `600 ${Math.max(13, R*0.62)}px -apple-system,"PingFang SC",sans-serif`;
+      glyph(c, x, y, R);
+      ctx.fillStyle = '#f1f5fb'; ctx.font = `600 ${Math.max(13, R*0.58)}px -apple-system,"PingFang SC",sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(Math.floor(c.u), x, y);
+      ctx.fillText(Math.floor(c.u), x, y + R * 0.18);
     }
 
-    // 兵
     for (const f of fleets) {
       ctx.beginPath(); ctx.arc(f.x, f.y, 7, 0, Math.PI*2);
       ctx.fillStyle = f.own === 1 ? '#60a5fa' : '#f87171'; ctx.fill();
@@ -308,7 +305,6 @@
       ctx.textAlign = 'center'; ctx.fillText(f.n, f.x, f.y - 12);
     }
 
-    // 拖拽
     if (drag) {
       if (drag.type === 'box') {
         const x = Math.min(drag.x0, drag.x1), y = Math.min(drag.y0, drag.y1);
