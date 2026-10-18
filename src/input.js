@@ -10,14 +10,14 @@ window.NanoInput={create(canvas,renderer,getState,adapter={}){
  // Actual bodies win over halos; 44px minimum touch diameter without stealing neighbouring cells.
  const hit=(p,touch=false)=>getState().cells.map(c=>{const q=renderer.point(c),r=Math.max(1,renderer.radius(c)),d=Math.hypot(p.x-q.x,p.y-q.y);return {c,d,r,body:d<=r};}).filter(h=>h.d<=(touch?Math.max(22,h.r+10):h.r+7)).sort((a,b)=>Number(b.body)-Number(a.body)||a.d/a.r-b.d/b.r||a.c.id-b.c.id)[0]?.c;
  function inside(p,pts){let yes=false;for(let i=0,j=pts.length-1;i<pts.length;j=i++){const a=pts[i],b=pts[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)yes=!yes;}return yes;}
- function charge(now=clock()){const d=ui.drag;if(d?.source!==undefined){const elapsed=Math.max(0,now-d.started);ui.percent=Math.min(100,START_PERCENT+INCREASE_PERCENT*Math.floor(elapsed/(FRAME_MS*DELAY_PERCENT)));}return ui.percent;}
+ function charge(now=clock()){const d=ui.drag;if(d&&(d.source!==undefined||d.chargeTarget!==undefined)){const elapsed=Math.max(0,now-d.started);ui.percent=Math.min(100,START_PERCENT+INCREASE_PERCENT*Math.floor(elapsed/(FRAME_MS*DELAY_PERCENT)));}return ui.percent;}
  ui.update=charge;
  function cancel(){const d=ui.drag;ui.drag=null;ui.percent=START_PERCENT;if(d&&canvas.hasPointerCapture?.(d.pointerId))canvas.releasePointerCapture(d.pointerId);}
  function send(state,ids,target){return adapter.send?adapter.send(ids,target,ui.percent):NanoCore.sendFleet(state,ids,target,side(),ui.percent);}
  canvas.addEventListener('pointerdown',e=>{
   if(!enabled()||ui.drag||e.isPrimary===false||e.button!==0)return;e.preventDefault();
   const p=point(e),touch=e.pointerType==='touch',c=hit(p,touch);ui.percent=START_PERCENT;
-  ui.drag={pointerId:e.pointerId,start:p,end:p,path:[p],moved:0,started:clock(),touch,source:c&&NanoCore.selectable(c,side())?c.id:undefined,type:touch?'lasso':'box'};
+  const chargeTarget=!!(c&&ui.selected.size&&!ui.selected.has(c.id));ui.drag={pointerId:e.pointerId,start:p,end:p,path:[p],moved:0,started:clock(),touch,source:!chargeTarget&&c&&NanoCore.selectable(c,side())?c.id:undefined,chargeTarget:chargeTarget?c.id:undefined,type:touch?'lasso':'box'};
   canvas.setPointerCapture(e.pointerId);
  },{passive:false});
  canvas.addEventListener('pointermove',e=>{const d=ui.drag;if(!d||d.pointerId!==e.pointerId)return;e.preventDefault();const p=point(e);d.end=p;d.moved=Math.max(d.moved,Math.hypot(p.x-d.start.x,p.y-d.start.y));const last=d.path[d.path.length-1];if(Math.hypot(p.x-last.x,p.y-last.y)>5)d.path.push(p);charge();},{passive:false});
@@ -26,6 +26,7 @@ window.NanoInput={create(canvas,renderer,getState,adapter={}){
   if(canvas.hasPointerCapture?.(e.pointerId))canvas.releasePointerCapture(e.pointerId);
   if(!enabled()){ui.percent=START_PERCENT;return;}
   const state=getState(),p=point(e);d.end=p;d.moved=Math.max(d.moved,Math.hypot(p.x-d.start.x,p.y-d.start.y));
+  if(d.chargeTarget!==undefined){const target=hit(p,d.touch);if(target&&target.id===d.chargeTarget&&send(state,ui.selected,target.id))ui.selected.clear();return;}
   if(d.moved<10){
    const c=hit(p,d.touch);if(!c){ui.selected.clear();return;}
    if(ui.selected.size&&(!NanoCore.selectable(c,side())||!ui.selected.has(c.id))){if(send(state,ui.selected,c.id))ui.selected.clear();return;}
