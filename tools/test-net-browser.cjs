@@ -20,7 +20,7 @@ async function run(){
  const evaluate=async expression=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
  const p={ws,call,evaluate,errors};connections.push(p);await call('Runtime.enable');await call('Page.enable');await call('Emulation.setDeviceMetricsOverride',{width:430,height:932,deviceScaleFactor:1,mobile:false});await call('Page.navigate',{url:pageURL});await until(()=>evaluate('document.documentElement.dataset.ready === "true" && !!window.NanoNet'));return p;
  }
- const a=await page(),newTarget=await a.call('Target.createTarget',{url:'about:blank'}),b=await page(newTarget.targetId,origins[1]);
+ const a=await page();assert.equal(await a.evaluate('document.getElementById("net-level").options.length'),10);assert.equal(await a.evaluate('document.getElementById("net-level").options[0].value'),'-1');const newTarget=await a.call('Target.createTarget',{url:'about:blank'}),b=await page(newTarget.targetId,origins[1]);
  for(const p of [a,b])await p.evaluate('document.getElementById("net-server").value='+JSON.stringify(url)+';document.getElementById("net-connect").click()');
  await until(()=>a.evaluate('document.getElementById("net-info").textContent.includes("服务器可达")'));
  await until(()=>b.evaluate('document.getElementById("net-info").textContent.includes("服务器可达")'));
@@ -35,6 +35,13 @@ async function run(){
  await b.evaluate('NanoNet.sendFleet([1],3,25);NanoNet.sendFleet([1],5,25)');await until(()=>b.evaluate('NanoApp.state.time>7&&NanoApp.state.units.length===0'),15000);await a.evaluate('NanoNet.sendFleet([0],1,100)');
  await until(()=>a.evaluate('NanoNet.room.phase==="finished"') ,25000);await until(()=>b.evaluate('NanoNet.room.phase==="finished"'));assert.equal(await a.evaluate('NanoNet.room.winner'),1);
  await a.evaluate('NanoNet.rematch()');await b.evaluate('NanoNet.rematch()');await until(()=>a.evaluate('NanoNet.room.phase==="lobby"'));
+ // Rematch lobby: host can switch through every new map; guest sees server name/symmetry.
+ for(let level=3;level<9;level++){
+  await a.evaluate('document.getElementById("net-level").value='+level+';document.getElementById("net-level").onchange();document.getElementById("net-configure").click()');
+  await until(()=>b.evaluate('NanoNet.room.options.level==='+level));
+  const summary=await b.evaluate('document.getElementById("net-config-summary").textContent');assert.ok(summary.includes(require('../src/arena-maps.js').names[level]));assert.ok(summary.includes('180°旋转对称'));
+  assert.equal(await b.evaluate('document.getElementById("net-settings").disabled'),true);
+ }
  await a.evaluate('document.getElementById("net-level").value=0;document.getElementById("net-configure").click()');await until(()=>b.evaluate('NanoNet.room.options.level===0'));
  await a.evaluate('document.getElementById("net-ready").click()');await b.evaluate('document.getElementById("net-ready").click()');await until(()=>a.evaluate('!document.getElementById("net-start").disabled'));await a.evaluate('document.getElementById("net-start").click()');await until(()=>b.evaluate('NanoNet.canPlay()&&NanoApp.state.level===0'));
  for(const p of [a,b]){await p.evaluate('window.originalNetSend=NanoNet.sendFleet;NanoNet.sendFleet=function(ids,target,percent){window.lastNetSend={ids:[...ids],target,percent};return originalNetSend.call(this,ids,target,percent);};window.savedStep=NanoCore.step;window.savedSend=NanoCore.sendFleet;NanoCore.step=()=>{throw Error("client simulated multiplayer")};NanoCore.sendFleet=()=>{throw Error("client changed multiplayer")};');assert.equal(await p.evaluate('document.getElementById("restart").disabled'),true);assert.equal(await p.evaluate('document.documentElement.scrollWidth>innerWidth'),false);}
@@ -56,12 +63,14 @@ async function run(){
  assert.deepEqual(file.errors,[]);assert.deepEqual(a.errors,[]);assert.deepEqual(b.errors,[]);await a.evaluate('NanoCore.step=savedStep;NanoCore.sendFleet=savedSend;document.getElementById("net-open").click();document.getElementById("net-leave").click()');await until(()=>a.evaluate('!document.getElementById("restart").disabled'));assert.equal(await a.evaluate('document.getElementById("level").options.length'),26);
  // Reuse the two different static origins for a configured four-seat room.
  await b.evaluate('document.getElementById("net-open").click();document.getElementById("net-leave").click()');await until(()=>b.evaluate('!NanoNet.room'));
- await a.evaluate('document.getElementById("net-count").value=4;document.getElementById("net-ai").value=2;document.getElementById("net-ai-difficulty").value="easy";document.getElementById("net-level").value=1;document.getElementById("net-create").click()');await until(()=>a.evaluate('NanoNet.connected&&NanoNet.room.options.playerCount===4'));
+ await a.evaluate('document.getElementById("net-count").value=4;document.getElementById("net-ai").value=2;document.getElementById("net-ai-difficulty").value="easy";document.getElementById("net-level").value=-1;document.getElementById("net-create").click()');await until(()=>a.evaluate('NanoNet.connected&&NanoNet.room.options.playerCount===4'));
  const fourCode=await a.evaluate('NanoNet.room.code');await b.evaluate('document.getElementById("net-code").value='+JSON.stringify(fourCode)+';document.getElementById("net-join").click()');await until(()=>b.evaluate('NanoNet.connected&&NanoNet.room.players.length===4'));
+ assert.equal(await b.evaluate('NanoNet.room.options.level'),-1);assert.ok((await b.evaluate('document.getElementById("net-config-summary").textContent')).includes('随机（开局揭晓）'));
  assert.equal(await b.evaluate('NanoNet.room.options.aiCount'),2);assert.equal(await b.evaluate('NanoNet.room.options.aiDifficulty'),'easy');
  for(const p of [a,b])await p.evaluate('(()=>{window.initialState=null;const old=NanoApp.networkSnapshot;NanoApp.networkSnapshot=function(m){if(m.state?.time===0)window.initialState=m.state;return old(m);};document.getElementById("net-ready").click();})()');await until(()=>a.evaluate('!document.getElementById("net-start").disabled'));await a.evaluate('document.getElementById("net-start").click()');await until(()=>b.evaluate('NanoNet.canPlay()&&NanoApp.state.playerCount===4'));
  const fourA=await a.evaluate('initialState'),fourB=await b.evaluate('initialState');assert.deepEqual(fourA,fourB);assert.equal(fourA.ai.length,2);assert.equal(fourA.ai[0].mode,'easy');
- const fourSummary=await b.evaluate('document.getElementById("net-config-summary").textContent');for(const label of ['总席位 4','当前人类 2','AI 2','easy'])assert.ok(fourSummary.includes(label));
+ const randomLevel=await b.evaluate('NanoNet.room.mapLevel');assert.equal(fourA.level,randomLevel);assert.ok(randomLevel>=0&&randomLevel<9);assert.equal(await a.evaluate('NanoNet.room.mapLevel'),randomLevel);
+ const fourSummary=await b.evaluate('document.getElementById("net-config-summary").textContent');for(const label of ['总席位 4','当前人类 2','AI 2','easy','90°旋转对称',require('../src/arena-maps.js').names[randomLevel]])assert.ok(fourSummary.includes(label));
  await b.call('Page.reload');await until(()=>b.evaluate('window.NanoNet&&NanoNet.connected&&NanoNet.canPlay()&&NanoNet.room.players.length===4'));
  assert.deepEqual(a.errors,[]);assert.deepEqual(b.errors,[]);
  console.log('PASS multiplayer Chrome: two DIFFERENT static origins + file://, saved/configurable HTTP/WS address, CORS whitelist/preflight, fair start resources/upgrades, real combat win + rematch, room UI, host setup, red-side pointer selection/send, multi-frame drag, manual special, no client simulation/mutation, refresh reconnect, return to single-player, no JS errors');

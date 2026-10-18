@@ -44,6 +44,7 @@ async function until(fn,timeout=6000){const end=Date.now()+timeout;while(Date.no
  b.close();await until(()=>!a.latest.room.players[1].connected);await until(()=>a.latest.room.phase==='finished',33000);assert.equal(a.latest.room.winner,1);assert.match(a.latest.room.reason,/30秒/);await post('resume',{token:b.token},401);
  console.log('PASS network: create/join, host config + ready, role/command validation, real 25fps combat, '+comparisons+' identical snapshots, reconnect + pause, rematch, actual 30s expiry, static isolation, CORS/preflight/null origin, mirrored resources/upgrades + deterministic seed');assert.equal(stderr,'');
  }finally{for(const c of clients){clearInterval(c.heartbeat);c.close();}child.kill();await new Promise(r=>{if(child.exitCode!==null)return r();child.once('exit',r);});}
+ await require('./test-net-maps.cjs').run();
  await require('./test-net-multi.cjs').run();
  await require('./test-net-browser.cjs').run();
 })().catch(e=>{console.error(e);process.exitCode=1;});
