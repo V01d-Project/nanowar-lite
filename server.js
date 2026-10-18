@@ -90,11 +90,11 @@ function createServer(config={}){
  }catch(e){if(!res.headersSent)json(res,e.status|| (e.code==='ENOENT'?404:500),{error:e.status?e.message:'请求失败'});else res.end();}});
  const timer=setInterval(()=>{const now=Date.now();for(const r of rooms.values()){
  for(const p of [...humans(r)]){if(p.stream&&now-p.lastSeen>15000){const stream=p.stream;detach(p,stream);stream.destroy();}if(p.stream||now<p.deadline)continue;sessions.delete(p.token);p.forfeited=true;
- if(r.phase==='playing'){for(const c of r.state.cells)if(c.own===p.side){Core.switchSide(c,0,r.state);Core.setPower(c,0);}r.state.units=r.state.units.filter(u=>u.side!==p.side);r.state.minis=r.state.minis.filter(m=>m.side!==p.side);r.pending[p.side-1]=[];r.reason=p.left?'玩家已离房弃权':'玩家断线超过30秒，已弃权';const win=Core.winner(r.state);if(win){r.state.over=win;r.phase='finished';r.winner=win;r.draw=win>r.options.playerCount;}}
+ if(r.phase==='playing'){for(const c of r.state.cells)if(c.own===p.side){Core.switchSide(c,0,r.state);Core.setPower(c,0);}r.state.units=r.state.units.filter(u=>u.side!==p.side);r.state.minis=r.state.minis.filter(m=>m.side!==p.side);r.pending[p.side-1]=[];r.reason=p.left?'玩家已离房弃权':'玩家断线超过30秒，已弃权';const win=Core.winner(r.state);if(win){const draw=win>r.options.playerCount;r.state.over=win;r.phase='finished';r.winner=draw?0:win;r.draw=draw;}}
  if(r.phase==='lobby'){if(p.side===r.hostSide){r.phase='closed';r.reason='房主已离房或保留超时';}r.players[p.side-1]=null;for(const q of humans(r))q.ready=false;}
  if(p.side===r.hostSide&&humans(r).length)r.hostSide=humans(r)[0].side;broadcast(r);}
  if(!humans(r).length||(!r.players.some(p=>p?.stream)&&now-r.touched>GRACE)){removeRoom(r);continue;}
- if(r.phase==='playing'&&online(r)){advance(r);if(r.state.over){r.phase='finished';r.winner=r.state.over;r.draw=r.winner>r.options.playerCount;r.reason='全部细胞和在途兵力结算';}broadcast(r);}
+ if(r.phase==='playing'&&online(r)){advance(r);if(r.state.over){const win=r.state.over,draw=win>r.options.playerCount;r.phase='finished';r.winner=draw?0:win;r.draw=draw;r.reason=draw?'平局：没有阵营存活':'全部细胞和在途兵力结算';}broadcast(r);}
  }},1000/Core.FPS);timer.unref();
  const heartbeat=setInterval(()=>{for(const p of sessions.values())if(p.stream&&!p.stream.destroyed&&!p.stream.writableEnded)p.stream.write('event: heartbeat\ndata: {}\n\n');},10000);heartbeat.unref();
  server.requestTimeout=10000;server.headersTimeout=10000;
