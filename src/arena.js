@@ -23,7 +23,7 @@ function map(level,count=2){
   return cells;
  }
  if(count>2){
-  const sector=level===0?[{x:152,y:0,size:80,own:1,u:60},{x:126,y:68,size:60,own:1,u:40},{x:200,y:74,type:'f',own:1,u:100},{x:82,y:0,type:'a',own:0,u:0}]:level===1?[{x:140,y:0,size:100,own:1,u:60},{x:90,y:62,size:44,own:0,u:10},{x:90,y:-62,size:44,own:0,u:10}]:[{x:140,y:0,size:100,own:1,u:60},{x:85,y:45,size:65,own:0,u:15}];
+  const sector=level===0?[{x:152,y:0,size:80,own:1,u:60},{x:126,y:68,size:60,own:1,u:40},{x:200,y:74,type:'f',own:1,u:100},{x:82,y:0,type:'a',own:0,u:0}]:level===1?[{x:140,y:0,size:100,own:1,u:60},{x:90,y:62,size:44,own:0,u:10},{x:90,y:-62,size:44,own:0,u:10},{x:70,y:0,type:'f',size:100,own:0,u:0},{x:49,y:49,type:'a',size:100,own:0,u:0}]:[{x:140,y:0,size:100,own:1,u:60},{x:85,y:45,size:65,own:0,u:15},{x:60,y:0,type:'f',size:100,own:0,u:0},{x:40,y:90,type:'a',size:100,own:0,u:0}];
   return Array.from({length:count},(_,i)=>sector.map(c=>{const a=Math.PI*2*i/count;return {...c,x:320+c.x*Math.cos(a)-c.y*Math.sin(a),y:240+c.x*Math.sin(a)+c.y*Math.cos(a),own:c.own?i+1:0};})).flat();
  }
  const pairs=halves[level].map(c=>[Object.assign({},c),Object.assign({},c,{x:640-c.x,y:480-c.y,own:c.own===1?2:0})]);
