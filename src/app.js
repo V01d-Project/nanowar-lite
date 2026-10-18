@@ -1,6 +1,6 @@
 /* Composition root: DOM and scheduling live here, never in core/AI. */
 (function(){'use strict';
-const C=NanoCore,canvas=document.getElementById('c'),renderer=NanoRender.create(canvas),$=id=>document.getElementById(id);let level=1,state,brains=[],speed=1,last=performance.now();$('level').innerHTML=Array.from({length:NanoLevels.totalLevels},(_,i)=>'<option value='+ (i+1) +'>'+String(i+1).padStart(2,'0')+' · 原版关卡</option>').join('')+'<option value=0>机制沙盒（含 AI）</option>';
+const C=NanoCore,canvas=document.getElementById('c'),renderer=NanoRender.create(canvas),$=id=>document.getElementById(id);let level=1,state,brains=[],speed=1,last=performance.now();$('level').innerHTML='<option value=0>示例 AI · 机制沙盒</option>'+Array.from({length:NanoLevels.totalLevels},(_,i)=>'<option value='+ (i+1) +'>'+String(i+1).padStart(2,'0')+' · 原版关卡</option>').join('');
 let net=null;const side=()=>net?net.side:1;const sideNames=['','蓝色','红色','绿色','黄色'],sideColors=['','#8cc8ff','#ff9fa6','#87cd77','#edca63'];
 const campaign=NanoCampaign.create(),ui=NanoInput.create(canvas,renderer,()=>state,{side,enabled:()=>!net||net.canPlay(),send:(ids,target,percent)=>net?net.sendFleet(ids,target,percent):C.sendFleet(state,ids,target,1,percent)});ui.percent=50;purchaseUI();
 function reset(){if(net)return;state=NanoLevels.create(level,{difficulty:Number($('difficulty').value),upgrades:{1:readUpgrades()}});brains=state.ai.map(NanoAI.create);ui.reset();last=performance.now();$('msg').hidden=true;render();}
