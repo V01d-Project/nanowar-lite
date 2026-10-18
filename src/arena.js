@@ -7,8 +7,8 @@ const {definitions,names}=Catalogue;
 function resolveLevel(level,seed){return level===-1?(seed>>>0)%names.length:level;}
 const halves=[
  [{x:110,y:130,size:100,own:1,u:60},{x:220,y:350,size:80,own:1,u:40},{x:110,y:280,type:'f',own:1,u:100},{x:270,y:100,type:'a',own:0,u:0}],
- [{x:240,y:240,size:100,own:1,u:60},{x:190,y:150,size:48,own:0,u:12},{x:300,y:170,size:42,own:0,u:8}],
- [{x:120,y:160,size:100,own:1,u:60},{x:240,y:120,size:80,own:0,u:15},{x:220,y:320,size:80,own:0,u:15}]
+ [{x:240,y:240,size:100,own:1,u:60},{x:190,y:150,size:48,own:0,u:12},{x:300,y:170,size:42,own:0,u:8},{x:200,y:345,type:'f',size:100,own:0,u:0},{x:145,y:250,type:'a',size:100,own:0,u:0}],
+ [{x:120,y:160,size:100,own:1,u:60},{x:240,y:120,size:80,own:0,u:15},{x:220,y:320,size:80,own:0,u:15},{x:170,y:55,type:'f',size:100,own:0,u:0},{x:170,y:425,type:'a',size:100,own:0,u:0}]
 ];
 function map(level,count=2){
  if(!Number.isInteger(count)||count<2||count>4)throw RangeError('Invalid player count');
