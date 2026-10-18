@@ -11,6 +11,7 @@ function random(s){s.seed=(Math.imul(s.seed,1664525)+1013904223)>>>0;return s.se
 function createState(map,options={}){
  map=map||[{x:247,y:131,own:1,u:30},{x:421,y:131,size:64,own:2,u:1}];
  const s={cells:[],units:[],minis:[],time:0,accumulator:0,over:0,seed:options.seed||1,nextUnit:1,difficulty:options.difficulty||0,level:options.level||0,upgrades:options.upgrades||{},ai:options.ai||[]};
+ if(options.pvp){s.pvp=true;s.frame=0;s.initialSeed=s.seed;}
  s.cells=map.map((data,id)=>{
  const c=Object.assign({id,x:0,y:0,size:100,own:0,u:0,type:'n',fat:-1,antibody:false,timer:0,growth:0,hits:0,ready:false,loading:false},data,{id});
  c.upgrades=Object.assign({speed:0,time:0,shield:0,special:0},s.upgrades[c.own]);c.powerMax=c.type==='n'?100:100*upgrade(c,'special');
@@ -24,7 +25,7 @@ function sync(c){c.ray2=c.type==='n'?Math.trunc(c.ray*clamp(.5+c.u/200,.5,1.1)*.
 function setPower(c,p){c.u=Number.isFinite(p)?Math.max(0,Math.trunc(p)):0;sync(c);}
 function switchSide(c,side,s){if(c.own!==side){if(c.type==='n'&&c.own===0)c.u+=Math.trunc(25*c.size/100);if(c.type!=='n'){c.ready=false;c.loading=false;c.timer=0;}if(side!==c.fat)c.fat=-1;c.own=side;c.upgrades=Object.assign({speed:0,time:0,shield:0,special:0},s&&s.upgrades[side]);c.powerMax=c.type==='n'?100:100*upgrade(c,'special');}sync(c);}
 function selectable(c,side){return !!c&&c.own===side&&(c.type==='n'||c.ready);}
-function canSend(c,side){return selectable(c,side)&&(c.type!=='n'||((c.fat===-1||c.fat===side)&&c.u>=2));}
+function canSend(c,side){return selectable(c,side)&&(c.fat===-1||c.fat===side)&&(c.type!=='n'||c.u>=2);}
 // Cell.as:373-410. Zero becomes neutral first; next hostile mini captures with one energy.
 function shieldMini(c,side){c.hits++;if(c.hits<upgrade(c,'shield')*10&&side!==c.fat&&c.fat!==-1)return true;c.hits=0;return false;}
 function arriveWhite(c,side,s,checkShield=true){if(checkShield&&shieldMini(c,side))return false;let p=c.u+(side===c.own||c.antibody?1:-1),owner=c.own;if(p===0)owner=0;else if(p<0){p=Math.abs(p);owner=side;}switchSide(c,owner,s);setPower(c,p);return true;}
@@ -58,8 +59,12 @@ function collide(a,b){separate(a,b);separate(b,a);if(a.kind==='w'&&b.kind==='a'&
 function tickMini(s,m){const c=s.cells[m.target];if(m.mode==='home'){const a=Math.atan2(c.y-m.y,c.x-m.x);m.v=Math.min(10,m.v+1);m.vx=Math.cos(a)*m.v;m.vy=Math.sin(a)*m.v;const d=Math.trunc(Math.hypot(c.x-m.x,c.y-m.y));if(d<c.ray*1.2&&!m.hit){m.hit=true;if(shieldMini(c,m.side)){m.mode='bounce';const a=Math.atan2(c.y-m.y,c.x-m.x);m.x=c.x-Math.cos(a)*c.ray*1.2;m.y=c.y-Math.sin(a)*c.ray*1.2;m.vx=-Math.cos(a)*(2+random(s)*3);m.vy=-Math.sin(a)*(2+random(s)*3);m.side=0;}}if(m.mode!=='bounce'&&d<c.ray2){arriveWhite(c,m.side,s,false);return false;}}else if(m.mode==='bounce'){if(m.life--===0)return false;m.vx*=.83;m.vy*=.83;}else{m.vx*=.83;m.vy*=.83;if(m.vx<.5&&m.vy<.5)m.mode='home';}m.x+=m.vx;m.y+=m.vy;return true;}
 function powerBySide(s){const p=[0,0,0,0,0];for(const c of s.cells)p[c.own]+=c.u;for(const u of s.units)p[u.side]+=u.power;return p;}
 // Game.as:1986-2044: ALL cell types count, and wait for minis; unlike previous Lite.
-function winner(s){const alive=new Set(s.cells.filter(c=>c.own).map(c=>c.own));for(const u of s.units)if(u.side)alive.add(u.side);for(const m of s.minis)if(m.side&&m.mode!=='bounce')alive.add(m.side);if(!alive.has(1))return 2;return alive.size===1&&s.units.length===0&&s.minis.length===0?1:0;}
-function tick(s){s.time+=FRAME;for(const c of s.cells){sync(c);if(c.type==='n'){c.growth+=FRAME;if(c.growth+EPS>=c.delay){c.growth-=c.delay;produce(c);}}else if(c.loading){c.timer+=FRAME;if(c.timer+EPS>=LOAD[c.type]){c.timer=LOAD[c.type];c.loading=false;c.ready=true;}}}s.units=s.units.filter(u=>tickUnit(s,u));for(let i=0;i<s.units.length;i++)for(let j=i+1;j<s.units.length;j++){const a=s.units[i],b=s.units[j];if(Math.trunc(Math.hypot(a.x-b.x,a.y-b.y))<a.ray+b.ray)collide(a,b);}s.minis=s.minis.filter(m=>tickMini(s,m));s.over=winner(s);}
+function winner(s){const alive=new Set(s.cells.filter(c=>c.own).map(c=>c.own));for(const u of s.units)if(u.side)alive.add(u.side);for(const m of s.minis)if(m.side&&m.mode!=='bounce')alive.add(m.side);if(s.pvp){if(s.units.length||s.minis.length)return 0;return alive.size===1?[...alive][0]:alive.size===0?(s.playerCount>2?5:3):0;}if(!alive.has(1))return 2;return alive.size===1&&s.units.length===0&&s.minis.length===0?1:0;}
+function tick(s){s.time+=FRAME;
+ // PvP has no permanent blue/host processing priority. The seed selects the first side,
+ // then priority rotates through every seat each frame. Campaign iteration stays untouched.
+ if(s.pvp){const count=s.playerCount||2,first=(s.frame+++(s.initialSeed%count))%count;const rank=side=>(side-1-first+count)%count;const order=(a,b)=>rank(a.side)-rank(b.side);s.units.sort(order);s.minis.sort(order);}
+for(const c of s.cells){sync(c);if(c.type==='n'){c.growth+=FRAME;if(c.growth+EPS>=c.delay){c.growth-=c.delay;produce(c);}}else if(c.loading){c.timer+=FRAME;if(c.timer+EPS>=LOAD[c.type]){c.timer=LOAD[c.type];c.loading=false;c.ready=true;}}}s.units=s.units.filter(u=>tickUnit(s,u));for(let i=0;i<s.units.length;i++)for(let j=i+1;j<s.units.length;j++){const a=s.units[i],b=s.units[j];if(Math.trunc(Math.hypot(a.x-b.x,a.y-b.y))<a.ray+b.ray)collide(a,b);}s.minis=s.minis.filter(m=>tickMini(s,m));s.over=winner(s);}
 function clampFrame(dt){return Number.isFinite(dt)?clamp(dt,0,.05):0;}
 function step(s,seconds){if(s.over)return;s.accumulator+=clampFrame(seconds);while(s.accumulator+EPS>=FRAME&&!s.over){s.accumulator-=FRAME;tick(s);}}
 return {MAX,FPS,FRAME,LOAD,LOAD_FRAMES,UPGRADES,createState,selectable,canSend,setPower,switchSide,arriveWhite,arriveFat,arriveAb,sendFleet,growthInterval,winner,powerBySide,clampFrame,step,random,upgrade,shieldMini,collide};
