@@ -23,7 +23,7 @@ function fair(state,count){
  }
 }
 function pure(){
- assert.equal(Arena.names.length,9);assert.equal(new Set(Arena.names).size,9);assert.deepEqual(Arena.names,Catalogue.names);
+ assert.equal(Arena.names.length,8);assert.equal(new Set(Arena.names).size,8);assert.deepEqual(Arena.names,Catalogue.names);
  for(const count of [2,3,4]){
   const counts=new Set();
   for(let level=0;level<Arena.names.length;level++){
@@ -31,7 +31,7 @@ function pure(){
     const upgrades={speed:n,time:n,shield:n,special:n},a=Arena.create(level,upgrades,123,count),b=Arena.create(level,upgrades,123,count);fair(a,count);
     for(let frame=0;frame<25;frame++){Core.step(a,Core.FRAME);Core.step(b,Core.FRAME);}assert.deepEqual(a,b,'deterministic map replay');
    }
-   if(level>=3)counts.add(Arena.map(level,count).length);
+   if(level>=2)counts.add(Arena.map(level,count).length);
    for(const mode of ['easy','normal','noob']){
     const bots=Array.from({length:count-1},(_,i)=>({side:i+2,mode})),s=Arena.create(level,{},123,count,bots),brains=bots.map(AI.create);
     for(let frame=0;frame<750&&!s.over;frame++){Core.step(s,Core.FRAME);for(const brain of brains)AI.think(s,brain,Core.FRAME);}assert.ok(s.nextUnit>1,'AI acts on '+Arena.names[level]+'/'+count+'/'+mode);
@@ -46,7 +46,7 @@ function pure(){
   for(let frame=0;frame<30000&&!s.over;frame++){Core.step(s,Core.FRAME);for(const brain of brains)AI.think(s,brain,Core.FRAME);}
   assert.ok(s.over>=1&&s.over<=count,'complete '+count+'-seat new-map match');console.log('maps: '+count+'-seat '+Arena.names[3]+' full AI match winner '+s.over+' at '+s.time.toFixed(1)+'s');
  }
- console.log('PASS maps: 9 maps × 2/3/4 seats × 5 upgrades; full cell/neutral rotation bijections, equal energy/upgrades, six distinct layouts, bounds/non-overlap, all AI modes, deterministic random');
+ console.log('PASS maps: 8 maps × 2/3/4 seats × 5 upgrades; full cell/neutral rotation bijections, equal energy/upgrades, six distinct layouts, bounds/non-overlap, all AI modes, deterministic random');
 }
 async function run(){
  pure();const server=createServer(),clients=[];await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
