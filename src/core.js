@@ -10,7 +10,7 @@ function upgrade(c,key){return UPGRADES[key][clamp(c.upgrades[key]||0,0,4)];}
 function random(s){s.seed=(Math.imul(s.seed,1664525)+1013904223)>>>0;return s.seed/4294967296;}
 function createState(map,options={}){
  map=map||[{x:247,y:131,own:1,u:30},{x:421,y:131,size:64,own:2,u:1}];
- const s={cells:[],units:[],minis:[],time:0,accumulator:0,over:0,seed:options.seed||1,nextUnit:1,difficulty:options.difficulty||0,level:options.level||0,upgrades:options.upgrades||{},ai:options.ai||[]};
+ const s={cells:[],units:[],minis:[],time:0,accumulator:0,over:0,speedBoost:options.speedBoost||{},seed:options.seed||1,nextUnit:1,difficulty:options.difficulty||0,level:options.level||0,upgrades:options.upgrades||{},ai:options.ai||[]};
  if(options.pvp){s.pvp=true;s.frame=0;s.initialSeed=s.seed;}
  s.cells=map.map((data,id)=>{
  const c=Object.assign({id,x:0,y:0,size:100,own:0,u:0,type:'n',fat:-1,antibody:false,timer:0,growth:0,hits:0,ready:false,loading:false},data,{id});
@@ -49,7 +49,7 @@ function burst(s,u){for(let i=0;i<u.power;i++){const t=s.cells[u.target];let vx=
 // Unit.as:22,173-199,224-288,379-449: expiry60s and pulse movement, two acceleration additions.
 function tickUnit(s,u){const c=s.cells[u.source],t=s.cells[u.target];u.age+=FRAME;if(u.age>=60)return false;
  // WhiteBloodUnit.as:126-178: transfer ceil-ish integer thirds over frames, never instant debit.
- if(u.kind==='w'&&u.power<u.wanted&&!u.moving){if(u.side===c.own&&c.fat!==-1&&c.fat!==u.side){setPower(c,c.u+u.power);return false;}if(c.u===0||u.side!==c.own){u.wanted=u.power;if(!u.power)return false;u.moving=true;return true;}let n=Math.max(1,Math.trunc((u.wanted-u.power)/3));n=Math.min(n,c.u);unitPower(u,u.power+n);setPower(c,c.u-n);if(u.power>=u.wanted||c.u===0){u.wanted=u.power;u.moving=true;const v=upgrade(c,'speed');u.vmax*=1+v;u.acceleration*=1+v;u.slow-=u.slow*v/3;}return true;}
+ if(u.kind==='w'&&u.power<u.wanted&&!u.moving){if(u.side===c.own&&c.fat!==-1&&c.fat!==u.side){setPower(c,c.u+u.power);return false;}if(c.u===0||u.side!==c.own){u.wanted=u.power;if(!u.power)return false;u.moving=true;return true;}let n=Math.max(1,Math.trunc((u.wanted-u.power)/3));n=Math.min(n,c.u);unitPower(u,u.power+n);setPower(c,c.u-n);if(u.power>=u.wanted||c.u===0){u.wanted=u.power;u.moving=true;const v=upgrade(c,'speed'),b=(s.speedBoost&&s.speedBoost[u.side])||0;u.vmax*=1+v;u.acceleration*=1+v;u.vmax*=1+b;u.acceleration*=1+b;u.slow-=u.slow*v/3;}return true;}
  u.x+=u.bx;u.y+=u.by;u.bx*=.85;u.by*=.85;
  if(u.moving){u.v=clamp(u.v,0,u.vmax);if(u.acc)u.angle=Math.atan2(t.y-u.y,t.x-u.x);u.x+=Math.cos(u.angle)*u.v;u.y+=Math.sin(u.angle)*u.v;if(u.acc){u.v+=u.acceleration*2;if(u.v>=u.vmax-.1)u.acc=false;}else{u.v*=u.slow;if(u.v<=u.vmin){u.acc=true;u.angle=Math.atan2(t.y-u.y,t.x-u.x);}}}
  for(const other of s.cells){if(other===c)continue;const d=Math.trunc(Math.hypot(u.x-other.x,u.y-other.y));if(other===t){const hit=u.kind==='w'?d<u.ray+other.ray:d<2;if(hit){if(u.kind==='w')burst(s,u);else if(u.kind==='f')arriveFat(other,u.side);else arriveAb(other,u.side,s);return false;}if(u.kind!=='w'&&d<other.ray-u.ray/2)u.angle=Math.atan2(other.y-u.y,other.x-u.x);}else if(d<u.ray+other.ray){separate(u,other);if(other.fat!==-1&&other.fat!==u.side)bounce(u,other);}}
