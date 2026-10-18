@@ -1,7 +1,7 @@
 /* Composition root: DOM and scheduling live here, never in core/AI. */
 (function(){'use strict';
 const C=NanoCore,canvas=document.getElementById('c'),renderer=NanoRender.create(canvas),$=id=>document.getElementById(id);let level=1,state,brains=[],speed=1,last=performance.now();$('level').innerHTML=Array.from({length:NanoLevels.totalLevels},(_,i)=>'<option value='+ (i+1) +'>'+String(i+1).padStart(2,'0')+' · 原版关卡</option>').join('')+'<option value=0>机制沙盒（含 AI）</option>';
-let net=null;const side=()=>net?net.side:1;
+let net=null;const side=()=>net?net.side:1;const sideNames=['','蓝色','红色','绿色','黄色'],sideColors=['','#8cc8ff','#ff9fa6','#87cd77','#edca63'];
 const campaign=NanoCampaign.create(),ui=NanoInput.create(canvas,renderer,()=>state,{side,enabled:()=>!net||net.canPlay(),send:(ids,target,percent)=>net?net.sendFleet(ids,target,percent):C.sendFleet(state,ids,target,1,percent)});ui.percent=50;purchaseUI();
 function reset(){if(net)return;state=NanoLevels.create(level,{difficulty:Number($('difficulty').value),upgrades:{1:readUpgrades()}});brains=state.ai.map(NanoAI.create);ui.reset();last=performance.now();$('msg').hidden=true;render();}
 function readUpgrades(){return campaign.upgrades;}
@@ -9,15 +9,15 @@ function purchaseUI(){ $('points').textContent=campaign.points;for(const key of 
 function render(){if(net){renderNet();return;}for(const id of ui.selected)if(!C.selectable(state.cells[id],1))ui.selected.delete(id);const p=C.powerBySide(state);$('pCount').textContent=p[1];$('eCount').textContent=p.slice(2).reduce((a,b)=>a+b,0);$('tip').textContent=level?('关卡 '+level+' / '+NanoLevels.totalLevels):'机制沙盒';$('status').textContent=NanoLevels.levels[level].name+' · '+Math.floor(state.time)+'s'+(app.paused?' · 已暂停':'');if(state.over){if(state.over===1)NanoCampaign.award(campaign,level,state.difficulty);$('msg').hidden=false;$('mtitle').textContent=state.over===1?'战场已掌控':'细胞已失守';$('msub').textContent='胜负统计所有细胞与在途兵力。可用升级点：'+campaign.points;$('next').hidden=state.over!==1||level===0||level===NanoLevels.totalLevels;}renderer.draw(state,ui);}
 function renderNet(){
  for(const id of ui.selected)if(!C.selectable(state.cells[id],side()))ui.selected.delete(id);
- const r=net.room,p=C.powerBySide(state);$('pCount').textContent=p[side()];$('eCount').textContent=p[3-side()];
- $('tip').textContent='房间 '+(r?.code||'连接中')+' · 我方 '+(side()===1?'蓝色':'红色');
+ const r=net.room,p=C.powerBySide(state);$('pCount').textContent=p[side()];$('eCount').textContent=p.reduce((n,v,i)=>n+(i&&i!==side()?v:0),0);
+ $('tip').textContent='房间 '+(r?.code||'连接中')+' · 我方 '+sideNames[side()];
  $('status').textContent=net.status();
  const finished=r?.phase==='finished';$('msg').hidden=!finished;
- if(finished){$('mtitle').textContent=r.winner===3?'双方平局':r.winner===side()?'战场已掌控':'细胞已失守';$('msub').textContent=r.reason+' · 双方同意后回到准备面板';$('next').hidden=true;$('again').textContent=r.players[side()-1]?.rematch?'等待对方同意':'请求重赛';}
+ if(finished){$('mtitle').textContent=r.draw?'本局平局':r.winner===side()?'战场已掌控':'细胞已失守';$('msub').textContent=r.reason+' · 所有人类同意后回到准备面板';$('next').hidden=true;$('again').textContent=r.players[side()-1]?.rematch?'等待其他玩家同意':'请求重赛';}
  renderer.draw(state,ui);
 }
 const app={get state(){return state;},ui,renderer,reset,render,campaign,paused:false,
- enterNetwork(client){net=client;ui.reset();document.querySelector('.hint').textContent='点选 / 框选 / 圈选'+(side()===1?'蓝色':'红色')+'细胞 → 点目标；特殊细胞就绪后手动发射';document.querySelector('.pill.blue, .pill.net-own')?.classList.add('net-own');document.querySelector('.pill.net-own').style.color=side()===1?'#8cc8ff':'#ff9fa6';document.querySelector('.pill.red').style.color=side()===1?'#ff9fa6':'#8cc8ff';app.paused=false;$('msg').hidden=true;for(const id of ['level','restart','pause','speed','upgrade'])$(id).disabled=true;},
+ enterNetwork(client){net=client;ui.reset();document.querySelector('.hint').textContent='点选 / 框选 / 圈选'+sideNames[side()]+'细胞 → 点目标；特殊细胞就绪后手动发射';document.querySelector('.pill.blue, .pill.net-own')?.classList.add('net-own');document.querySelector('.pill.net-own').style.color=sideColors[side()];document.querySelector('.pill.red').style.color='#ff9fa6';app.paused=false;$('msg').hidden=true;for(const id of ['level','restart','pause','speed','upgrade'])$(id).disabled=true;},
  networkSnapshot(snapshot){if(!net)return;if(snapshot.state){state=snapshot.state;level=state.level;}render();},
  leaveNetwork(){net=null;document.querySelector('.hint').innerHTML='点选 / 框选 / 圈选蓝色细胞 → 点目标，或直接拖到目标<br>特殊细胞：充能 → 读条 → 就绪后手动发射';document.querySelector('.pill.blue').style.color='';document.querySelector('.pill.red').style.color='';for(const id of ['level','restart','pause','speed','upgrade'])$(id).disabled=false;$('again').textContent='再来一局';level=Number($('level').value);reset();},
  setLevel(n){if(net)return;level=n;$('level').value=n;reset();}};window.NanoApp=app;

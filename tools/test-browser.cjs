@@ -40,7 +40,13 @@ async function until(fn){for(let i=0;i<160;i++){const v=await fn();if(v)return v
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
    await call('Page.navigate',{url});
    await until(()=>evaluate('document.documentElement?.dataset.ready === "true"'));
-   await evaluate('NanoApp.paused=true; NanoApp.reset(); NanoApp.render();');
+   assert.equal(await evaluate('document.querySelectorAll("#net-open").length'),1,'static multiplayer entrance');
+   await evaluate('document.getElementById("net-open").click()');
+   assert.equal(await evaluate('document.getElementById("net-panel").open'),true);
+   assert.match(await evaluate('document.getElementById("net-server").placeholder'),/^https?:/);
+   assert.equal(await evaluate('document.getElementById("net-server").placeholder.includes("nw."+"lagrange.top")'),false);
+   assert.equal(await evaluate('document.documentElement.scrollWidth>innerWidth'),false);
+   await evaluate('document.getElementById("net-close").click();NanoApp.paused=true; NanoApp.reset(); NanoApp.render();');
    async function shot(suffix){const result=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});const file=path.join(shots,width+'x'+height+'-'+suffix+'.png');fs.writeFileSync(file,Buffer.from(result.data,'base64'));console.log('screenshot '+path.relative(root,file));}
    async function layoutCheck(){const l=await evaluate('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};return {viewport:[innerWidth,innerHeight],overflow:document.documentElement.scrollWidth>innerWidth,hud:rect(document.querySelector(".hud")),hint:rect(document.querySelector(".hint")),cells:NanoApp.state.cells.map(c=>({id:c.id,...NanoApp.renderer.point(c),r:NanoApp.renderer.radius(c),special:c.type!=="n",dense:NanoApp.state.cells.length>10||NanoApp.state.level>=9}))};})()');assert.deepEqual(l.viewport,[width,height]);assert.equal(l.overflow,false);for(const c of l.cells){const extra=c.special?(c.dense?3:13):3;assert.ok(c.x-c.r-extra>0&&c.x+c.r+extra<width,'cell clipped horizontally');assert.ok(c.y-c.r-extra>l.hud.y+l.hud.h,'cell overlaps HUD');assert.ok(c.y+c.r+(c.special?(c.dense?3:48):3)<l.hint.y,'cell overlaps instructions');}for(let i=0;i<l.cells.length;i++)for(let j=i+1;j<l.cells.length;j++){const a=l.cells[i],b=l.cells[j];assert.ok(Math.hypot(a.x-b.x,a.y-b.y)>a.r+b.r+(a.special?(a.dense?3:13):0)+(b.special?(b.dense?3:13):0),'cell rings overlap '+JSON.stringify({a,b}));}return l;}
    for(const level of [...Array.from({length:25},(_,i)=>i+1),0]){await evaluate('NanoApp.setLevel('+level+');NanoApp.render();');await layoutCheck();if([1,2,3,9,19,25,0].includes(level))await shot('level-'+level);}assert.equal(await evaluate('document.getElementById("level").options.length'),26);
