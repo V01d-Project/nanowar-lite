@@ -1,0 +1,87 @@
+ok 1 - all four upgrade tables match Game.as:42-51
+ok 2 - ordinary cap 100, diam 88 with 0.83 collision coefficient
+ok 3 - production interpolation follows fixed SIZE, not current energy
+ok 4 - discrete production caps at 100 and over-cap decays
+ok 5 - neutral and specials do not passively produce
+ok 6 - antibody divides production delay by 1.5 after first tick
+ok 7 - production upgrade reduces delay by 12 percent
+ok 8 - hostile fat drains production and blocks departure
+ok 9 - hostile fat blocks ready special launch
+ok 10 - f becomes selectable after 240 frames, never auto fires
+ok 11 - a becomes selectable after 360 frames, never auto fires
+ok 12 - special radius24 and capacity uses special upgrade
+ok 13 - incomplete charge cancels timer and readiness
+ok 14 - fat removes hostile antibody first, then applies, then removes hostile shield
+ok 15 - friendly fat preserves friendly antibody
+ok 16 - fat cannot order attacks on either special type
+ok 17 - infection retains ordinary and special energy
+ok 18 - neutral infection grants size based capture bonus
+ok 19 - hostile shield blocks infection, matching shield survives
+ok 20 - antibody absorbs each normal mini as +1 beyond soft cap100
+ok 21 - zero neutralizes, next soldier captures with one energy
+ok 22 - base shield lets through every fourth hostile mini
+ok 23 - level4 shield lets through every sixth hostile mini
+ok 24 - matching shield side bypasses shield filtering
+ok 25 - dispatch creates one packet and transfers thirds across frames
+ok 26 - packets split at100 and percent supports25/50/75/100
+ok 27 - minimum dispatch is two energy; one cannot leave
+ok 28 - source ownership change cancels empty assembling packet
+ok 29 - flight acceleration applied twice, then coast slowdown
+ok 30 - speed upgrade changes packet acceleration and cap
+ok 31 - normal packet bursts into individual minis and resolves damage
+ok 32 - antibody unit converts a colliding normal packet preserving power
+ok 33 - fat collision bounces hostile normal and antibody units
+ok 34 - self/duplicate/wrong-side sources are validated
+ok 35 - special cells count toward victory even empty
+ok 36 - zero energy normal ownership prevents elimination
+ok 37 - minis prevent premature victory
+ok 38 - delta time bound and fixed25fps accumulation
+ok 39 - original first three maps retain cell counts and starting powers
+ok 40 - difficulty1/2 starts enemy energy at1.5x/2x
+ok 41 - Normal AI clock uses125 frames plus initial one second
+ok 42 - Normal AI feeds its antibody before lower priority attacks
+ok 43 - Normal AI combined attack uses80 percent from top two
+ok 44 - Normal AI cannot bypass hostile fat blockade
+ok 45 - seeded arena simulation is reproducible for120 seconds
+ok 46 - special overcharge retains energy above one launch cost
+ok 47 - hostile fat drains to zero and stays zero (no unsigned wrap)
+ok 48 - all first three original levels can be played to victory
+ok 49 - campaign exports all25levels,372cells and33AI instances
+ok 50 - all cell fields agree with raw timeline placement and radius
+ok 51 - all three difficulty upgrade/reward rows are exported for every level
+ok 52 - unnamed AI defaults are not lost during extraction
+ok 53 - tutorial and initial special rules exist for every original tutorial
+ok 54 - all four extracted AI types are instantiated without substitution
+ok 55 - all25maps at all3difficulties simulate20seconds without nonfinite state
+ok 56 - 时间常量与 25fps 对照
+ok 57 - master biases targeting to the player, malice forces it
+ok 58 - master and malice reuse expert enemy upgrades and rewards
+ok 59 - default campaign pregrants all25levels x3difficulty rewards once
+ok 60 - upgrade points: first victory per difficulty only, no tutorial/sandbox reward
+ok 61 - upgrade purchase rejects insufficient points and caps level4 with original costs
+ok 62 - Easy close attack dispatches50percent unlike Normal75percent
+ok 63 - Noob attacks only within250 and when total faction power exceeds15
+ok 64 - Easy/Noob jitter is quantized25fps and Normal is not jittered
+ok 65 - partial assembly stops debiting after source capture
+ok 66 - hostile fat arriving during assembly cancels and refunds packet
+ok 67 - special flight prevents premature player defeat and victory
+ok 68 - last empty special wins once no hostile force survives
+ok 69 - special capture restarts charge timer with new owner capacity
+ok 70 - nonfinite and negative energy cannot poison state
+ok 71 - zero energy owned cell does not permanently stop AI
+ok 72 - Normal and Easy side1 mirror AI never attacks itself
+ok 73 - Noob targets side3 and never chooses own cells
+ok 74 - AI selects existing foe when default side1 was eliminated
+ok 75 - every active AI mode fires ready specials without normal cells
+ok 76 - ready AI antibody never wastes shot on its own immune cell
+ok 77 - Normal and Easy escape level4 long range idle loop
+ok 78 - idle AI can use unblocked second strongest source
+ok 79 - Noob finishes last enemy special instead of ignoring it forever
+ok 80 - Noob uses nearby weaker source when strongest is out of range
+ok 81 - touch target body wins over friendly expanded hit halo
+ok 82 - touch release displacement counts even without pointermove event
+ok 83 - ready special is selected by touch then fires manually
+ok 84 - special selection stays distinct from charge and loading rings
+ok 85 - selected special ring never strikes through its status labels
+ok 86 - short landscape viewport retains positive camera and canvas radii
+PASS 86/86 core + AI + level tests (0 dependencies)

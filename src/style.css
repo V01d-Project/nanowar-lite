@@ -8,6 +8,3 @@
 :root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
 @supports(height:100dvh){html,body{height:100dvh}}
 @media(display-mode:standalone){.hud{padding-top:calc(var(--safe-top) + 10px)}.bottom{padding-bottom:calc(var(--safe-bottom) + 10px)}#net-panel{max-height:calc(100dvh - 20px)}}
-
-/* Read-only charge indicator; never a cycling control. */
-#percent{display:flex;align-items:center;white-space:nowrap;font-size:12px;padding:10px 9px;color:#ffd275;min-width:77px}html,body{overscroll-behavior:none}canvas{-webkit-user-select:none;user-select:none}dialog input[type=checkbox],#net-panel input[type=checkbox]{appearance:auto;width:22px;height:22px;accent-color:#68b5ff;flex:none}

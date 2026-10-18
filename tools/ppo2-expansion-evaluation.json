@@ -1,0 +1,1802 @@
+[
+  {
+    "index": 0,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.23999999999932,
+    "steps": []
+  },
+  {
+    "index": 1,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 2,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 60.79999999999888,
+    "steps": []
+  },
+  {
+    "index": 3,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 64.03999999999881,
+    "steps": []
+  },
+  {
+    "index": 4,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 58.279999999998935,
+    "steps": []
+  },
+  {
+    "index": 5,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1599999999993,
+    "steps": []
+  },
+  {
+    "index": 6,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.28000000000463,
+    "steps": []
+  },
+  {
+    "index": 7,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.35999999999932,
+    "steps": []
+  },
+  {
+    "index": 8,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 147.76000000000488,
+    "steps": []
+  },
+  {
+    "index": 9,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.27999999999932,
+    "steps": []
+  },
+  {
+    "index": 10,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 11,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.639999999999205,
+    "steps": []
+  },
+  {
+    "index": 12,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.4799999999991,
+    "steps": []
+  },
+  {
+    "index": 13,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.35999999999947,
+    "steps": []
+  },
+  {
+    "index": 14,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.03999999999928,
+    "steps": []
+  },
+  {
+    "index": 15,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.16000000000462,
+    "steps": []
+  },
+  {
+    "index": 16,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.479999999999677,
+    "steps": []
+  },
+  {
+    "index": 17,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 139.48000000000653,
+    "steps": []
+  },
+  {
+    "index": 18,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.27999999999932,
+    "steps": []
+  },
+  {
+    "index": 19,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 20,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.91999999999909,
+    "steps": []
+  },
+  {
+    "index": 21,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 59.07999999999892,
+    "steps": []
+  },
+  {
+    "index": 22,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 47.959999999999155,
+    "steps": []
+  },
+  {
+    "index": 23,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1599999999993,
+    "steps": []
+  },
+  {
+    "index": 24,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 95.12000000000367,
+    "steps": []
+  },
+  {
+    "index": 25,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.63999999999931,
+    "steps": []
+  },
+  {
+    "index": 26,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 172.95999999999987,
+    "steps": []
+  },
+  {
+    "index": 27,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.15999999999932,
+    "steps": []
+  },
+  {
+    "index": 28,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 29,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.679999999999204,
+    "steps": []
+  },
+  {
+    "index": 30,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.5199999999991,
+    "steps": []
+  },
+  {
+    "index": 31,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.35999999999947,
+    "steps": []
+  },
+  {
+    "index": 32,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.03999999999928,
+    "steps": []
+  },
+  {
+    "index": 33,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.00000000000459,
+    "steps": []
+  },
+  {
+    "index": 34,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.479999999999677,
+    "steps": []
+  },
+  {
+    "index": 35,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 133.6000000000077,
+    "steps": []
+  },
+  {
+    "index": 36,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.31999999999932,
+    "steps": []
+  },
+  {
+    "index": 37,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 38,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.99999999999909,
+    "steps": []
+  },
+  {
+    "index": 39,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 49.15999999999913,
+    "steps": []
+  },
+  {
+    "index": 40,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 58.359999999998934,
+    "steps": []
+  },
+  {
+    "index": 41,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1199999999993,
+    "steps": []
+  },
+  {
+    "index": 42,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.28000000000463,
+    "steps": []
+  },
+  {
+    "index": 43,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.63999999999931,
+    "steps": []
+  },
+  {
+    "index": 44,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 119.04000000000741,
+    "steps": []
+  },
+  {
+    "index": 45,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.31999999999932,
+    "steps": []
+  },
+  {
+    "index": 46,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 47,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.599999999999206,
+    "steps": []
+  },
+  {
+    "index": 48,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.5199999999991,
+    "steps": []
+  },
+  {
+    "index": 49,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.399999999999466,
+    "steps": []
+  },
+  {
+    "index": 50,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 66.99999999999928,
+    "steps": []
+  },
+  {
+    "index": 51,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.00000000000459,
+    "steps": []
+  },
+  {
+    "index": 52,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.519999999999676,
+    "steps": []
+  },
+  {
+    "index": 53,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 139.6800000000065,
+    "steps": []
+  },
+  {
+    "index": 54,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.35999999999932,
+    "steps": []
+  },
+  {
+    "index": 55,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 56,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 60.83999999999888,
+    "steps": []
+  },
+  {
+    "index": 57,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 44.99999999999922,
+    "steps": []
+  },
+  {
+    "index": 58,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 58.239999999998936,
+    "steps": []
+  },
+  {
+    "index": 59,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1999999999993,
+    "steps": []
+  },
+  {
+    "index": 60,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.24000000000463,
+    "steps": []
+  },
+  {
+    "index": 61,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.639999999999205,
+    "steps": []
+  },
+  {
+    "index": 62,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 153.60000000000372,
+    "steps": []
+  },
+  {
+    "index": 63,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.23999999999932,
+    "steps": []
+  },
+  {
+    "index": 64,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 65,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.47999999999921,
+    "steps": []
+  },
+  {
+    "index": 66,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.359999999999104,
+    "steps": []
+  },
+  {
+    "index": 67,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.399999999999466,
+    "steps": []
+  },
+  {
+    "index": 68,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.07999999999929,
+    "steps": []
+  },
+  {
+    "index": 69,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.16000000000462,
+    "steps": []
+  },
+  {
+    "index": 70,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.519999999999676,
+    "steps": []
+  },
+  {
+    "index": 71,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 139.84000000000646,
+    "steps": []
+  },
+  {
+    "index": 72,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.31999999999932,
+    "steps": []
+  },
+  {
+    "index": 73,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 74,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.99999999999909,
+    "steps": []
+  },
+  {
+    "index": 75,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 44.99999999999922,
+    "steps": []
+  },
+  {
+    "index": 76,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 58.279999999998935,
+    "steps": []
+  },
+  {
+    "index": 77,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1199999999993,
+    "steps": []
+  },
+  {
+    "index": 78,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.20000000000462,
+    "steps": []
+  },
+  {
+    "index": 79,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.7999999999992,
+    "steps": []
+  },
+  {
+    "index": 80,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 173.59999999999974,
+    "steps": []
+  },
+  {
+    "index": 81,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.27999999999932,
+    "steps": []
+  },
+  {
+    "index": 82,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 83,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.679999999999204,
+    "steps": []
+  },
+  {
+    "index": 84,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.6399999999991,
+    "steps": []
+  },
+  {
+    "index": 85,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.31999999999947,
+    "steps": []
+  },
+  {
+    "index": 86,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1199999999993,
+    "steps": []
+  },
+  {
+    "index": 87,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.0800000000046,
+    "steps": []
+  },
+  {
+    "index": 88,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.519999999999676,
+    "steps": []
+  },
+  {
+    "index": 89,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 139.48000000000653,
+    "steps": []
+  },
+  {
+    "index": 90,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.23999999999932,
+    "steps": []
+  },
+  {
+    "index": 91,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 92,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.99999999999909,
+    "steps": []
+  },
+  {
+    "index": 93,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 64.03999999999881,
+    "steps": []
+  },
+  {
+    "index": 94,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 47.959999999999155,
+    "steps": []
+  },
+  {
+    "index": 95,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1999999999993,
+    "steps": []
+  },
+  {
+    "index": 96,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 104.48000000000513,
+    "steps": []
+  },
+  {
+    "index": 97,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.75999999999931,
+    "steps": []
+  },
+  {
+    "index": 98,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 165.68000000000131,
+    "steps": []
+  },
+  {
+    "index": 99,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.11999999999932,
+    "steps": []
+  },
+  {
+    "index": 100,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 101,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.919999999999305,
+    "steps": []
+  },
+  {
+    "index": 102,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.4799999999991,
+    "steps": []
+  },
+  {
+    "index": 103,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.35999999999947,
+    "steps": []
+  },
+  {
+    "index": 104,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1199999999993,
+    "steps": []
+  },
+  {
+    "index": 105,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 100.92000000000458,
+    "steps": []
+  },
+  {
+    "index": 106,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.559999999999675,
+    "steps": []
+  },
+  {
+    "index": 107,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 139.76000000000647,
+    "steps": []
+  },
+  {
+    "index": 108,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.439999999999316,
+    "steps": []
+  },
+  {
+    "index": 109,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 110,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.95999999999909,
+    "steps": []
+  },
+  {
+    "index": 111,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 64.15999999999883,
+    "steps": []
+  },
+  {
+    "index": 112,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 54.91999999999901,
+    "steps": []
+  },
+  {
+    "index": 113,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1199999999993,
+    "steps": []
+  },
+  {
+    "index": 114,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.28000000000463,
+    "steps": []
+  },
+  {
+    "index": 115,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.71999999999931,
+    "steps": []
+  },
+  {
+    "index": 116,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 135.92000000000724,
+    "steps": []
+  },
+  {
+    "index": 117,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.23999999999932,
+    "steps": []
+  },
+  {
+    "index": 118,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 119,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.919999999999305,
+    "steps": []
+  },
+  {
+    "index": 120,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.5599999999991,
+    "steps": []
+  },
+  {
+    "index": 121,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.399999999999466,
+    "steps": []
+  },
+  {
+    "index": 122,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.07999999999929,
+    "steps": []
+  },
+  {
+    "index": 123,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.12000000000461,
+    "steps": []
+  },
+  {
+    "index": 124,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.479999999999677,
+    "steps": []
+  },
+  {
+    "index": 125,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 133.5200000000077,
+    "steps": []
+  },
+  {
+    "index": 126,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.31999999999932,
+    "steps": []
+  },
+  {
+    "index": 127,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 128,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.759999999999096,
+    "steps": []
+  },
+  {
+    "index": 129,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 74.32000000000042,
+    "steps": []
+  },
+  {
+    "index": 130,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 58.279999999998935,
+    "steps": []
+  },
+  {
+    "index": 131,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1199999999993,
+    "steps": []
+  },
+  {
+    "index": 132,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.24000000000463,
+    "steps": []
+  },
+  {
+    "index": 133,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.7199999999992,
+    "steps": []
+  },
+  {
+    "index": 134,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 145.88000000000525,
+    "steps": []
+  },
+  {
+    "index": 135,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.27999999999932,
+    "steps": []
+  },
+  {
+    "index": 136,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 137,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.919999999999305,
+    "steps": []
+  },
+  {
+    "index": 138,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.4799999999991,
+    "steps": []
+  },
+  {
+    "index": 139,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.31999999999947,
+    "steps": []
+  },
+  {
+    "index": 140,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.07999999999929,
+    "steps": []
+  },
+  {
+    "index": 141,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 100.96000000000458,
+    "steps": []
+  },
+  {
+    "index": 142,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.479999999999677,
+    "steps": []
+  },
+  {
+    "index": 143,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 120.64000000000766,
+    "steps": []
+  },
+  {
+    "index": 144,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.31999999999932,
+    "steps": []
+  },
+  {
+    "index": 145,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 146,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.839999999999094,
+    "steps": []
+  },
+  {
+    "index": 147,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.27999999999921,
+    "steps": []
+  },
+  {
+    "index": 148,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 54.87999999999901,
+    "steps": []
+  },
+  {
+    "index": 149,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1199999999993,
+    "steps": []
+  },
+  {
+    "index": 150,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.24000000000463,
+    "steps": []
+  },
+  {
+    "index": 151,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.679999999999204,
+    "steps": []
+  },
+  {
+    "index": 152,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 145.80000000000527,
+    "steps": []
+  },
+  {
+    "index": 153,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.15999999999932,
+    "steps": []
+  },
+  {
+    "index": 154,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 155,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.639999999999205,
+    "steps": []
+  },
+  {
+    "index": 156,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.6399999999991,
+    "steps": []
+  },
+  {
+    "index": 157,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.439999999999465,
+    "steps": []
+  },
+  {
+    "index": 158,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 66.99999999999928,
+    "steps": []
+  },
+  {
+    "index": 159,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 100.96000000000458,
+    "steps": []
+  },
+  {
+    "index": 160,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.479999999999677,
+    "steps": []
+  },
+  {
+    "index": 161,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 139.36000000000655,
+    "steps": []
+  },
+  {
+    "index": 162,
+    "map": 0,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.039999999999324,
+    "steps": []
+  },
+  {
+    "index": 163,
+    "map": 1,
+    "side": 1,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 164,
+    "map": 2,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.99999999999909,
+    "steps": []
+  },
+  {
+    "index": 165,
+    "map": 3,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 49.15999999999913,
+    "steps": []
+  },
+  {
+    "index": 166,
+    "map": 4,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 58.279999999998935,
+    "steps": []
+  },
+  {
+    "index": 167,
+    "map": 5,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 67.1999999999993,
+    "steps": []
+  },
+  {
+    "index": 168,
+    "map": 6,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.24000000000463,
+    "steps": []
+  },
+  {
+    "index": 169,
+    "map": 7,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.55999999999921,
+    "steps": []
+  },
+  {
+    "index": 170,
+    "map": 8,
+    "side": 1,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 173.95999999999967,
+    "steps": []
+  },
+  {
+    "index": 171,
+    "map": 0,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 40.35999999999932,
+    "steps": []
+  },
+  {
+    "index": 172,
+    "map": 1,
+    "side": 2,
+    "win": 0,
+    "loss": 0,
+    "draw": 1,
+    "seconds": 179.99999999999847,
+    "steps": []
+  },
+  {
+    "index": 173,
+    "map": 2,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 45.55999999999921,
+    "steps": []
+  },
+  {
+    "index": 174,
+    "map": 3,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 50.5599999999991,
+    "steps": []
+  },
+  {
+    "index": 175,
+    "map": 4,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 33.31999999999947,
+    "steps": []
+  },
+  {
+    "index": 176,
+    "map": 5,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 66.95999999999927,
+    "steps": []
+  },
+  {
+    "index": 177,
+    "map": 6,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 101.0400000000046,
+    "steps": []
+  },
+  {
+    "index": 178,
+    "map": 7,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 23.479999999999677,
+    "steps": []
+  },
+  {
+    "index": 179,
+    "map": 8,
+    "side": 2,
+    "win": 1,
+    "loss": 0,
+    "draw": 0,
+    "seconds": 130.1200000000084,
+    "steps": []
+  }
+]

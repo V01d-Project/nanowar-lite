@@ -1,0 +1,4 @@
+'use strict';
+const fs=require('fs'),P=require('./train-ppo2-residual.cjs'),A=require('../src/arena.js'),C=require('../src/core.js'),AI=require('../src/ai.js');
+const m=JSON.parse(fs.readFileSync(process.argv[2]||'tools/ppo-v2-pilot-checkpoint.json')),w=Float64Array.from(m.weights),s=A.create(1,{},12345,2),b=AI.create({side:2,mode:'normal',timeDecision:5000}),trace=[];let next=6;
+for(let f=0;f<4500&&!s.over;f++){if(s.time+1e-8>=next){const o=P.candidates(s,1),d=P.distribution(w,o.xs);const ranks=d.p.map((p,i)=>({p,action:o.actions[i]})).sort((a,b)=>b.p-a.p);if(trace.length<12)trace.push({time:s.time,cells:s.cells.map(c=>[c.id,c.own,c.u,c.type]),top:ranks.slice(0,4)});if(ranks[0].action){const a=ranks[0].action;C.sendFleet(s,a.ids,a.target,1,a.pct);}next+=5;}AI.think(s,b,.04);C.step(s,.04);}console.log(JSON.stringify({trainedGames:m.trainedGames,over:s.over,time:s.time,trace}));

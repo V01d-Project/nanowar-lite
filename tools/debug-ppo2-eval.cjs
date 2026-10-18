@@ -1,0 +1,1 @@
+'use strict';const P=require('./train-ppo2-quarter.cjs'),m=require('./ppo2-quarter-model.json'),A=require('../src/arena.js'),w=Float64Array.from(m.weights);for(let i=0;i<500;i++){try{P.episode(w,i,3100000701,false,m.config);}catch(e){console.log(JSON.stringify({i,map:i%9,names:A.names,error:String(e)}));throw e;}}console.log('PASS500');

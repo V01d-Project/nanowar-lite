@@ -1,0 +1,11 @@
+'use strict';
+const fs=require('fs'),assert=require('assert/strict'),crypto=require('crypto'),P=require('./train-ppo-v2.cjs');
+const base=process.argv[2]||'tools/ppo-v2',m=JSON.parse(fs.readFileSync(base+'-model.json')),w=Float64Array.from(m.weights),start=Date.now();
+const hash=()=>crypto.createHash('sha256').update(Buffer.from(w.buffer)).digest('hex');
+const sourceHash=()=>Object.fromEntries(['src/core.js','src/ai.js','src/arena.js','src/arena-maps.js'].map(f=>[f,crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex')]));
+const before=hash(),sourceBefore=sourceHash(),bases=[3100000701,3300000901,3500001101];
+const trainSeeds=new Set(Array.from({length:m.config.games},(_,i)=>(m.config.trainSeedBase+Math.imul(i+1,2654435761))>>>0));
+const all=[],sets=bases.map(seedBase=>{const es=Array.from({length:500},(_,i)=>{const seed=(seedBase+Math.imul(i+1,2654435761))>>>0;assert(!trainSeeds.has(seed));return P.episode(w,i,seedBase,false,m.config);});all.push(...es);return {seedBase,...P.stats(es),passed:P.stats(es).winRate>=.65&&P.stats(es).byMap.every(x=>x.wins/x.games>=.5),drawRate:es.reduce((a,e)=>a+e.draw,0)/500};});
+assert.equal(hash(),before);assert.deepEqual(sourceHash(),sourceBefore);
+const total=P.stats(all);const out={model:base+'-model.json',modelSha256:before,sourceHashes:sourceBefore,trainedGames:m.trainedGames,sets,total,drawRate:total.draws/total.games,passed:sets.every(x=>x.passed)&&total.byMap.every(x=>x.wins/x.games>=.5),seconds:(Date.now()-start)/1000,protocol:'3 prespecified bases x500; untouched final policy, greedy; actual real Core terminal wins only;180s draws;seat alternating;Normal5s; no seed used for learning/selection'};
+fs.writeFileSync(base+'-1500-evaluation.json',JSON.stringify(all,null,2));fs.writeFileSync(base+'-1500-results.json',JSON.stringify(out,null,2));console.log(JSON.stringify(out));

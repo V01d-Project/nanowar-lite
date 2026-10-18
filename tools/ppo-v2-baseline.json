@@ -1,0 +1,4 @@
+{
+  "note": "At start src/arena-maps.js already modified externally: hive adds center antibody. Not modified by PPO task. Earlier read/audit raced this change; freeze hash during final training/eval. test-core passes86; test-net-maps pure passes counts6 now, live fails server compactState null (out of scope).",
+  "started": "2026-10-18T06:51:07.215Z"
+}

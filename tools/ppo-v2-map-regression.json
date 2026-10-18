@@ -1,0 +1,99 @@
+{
+  "passed": true,
+  "counts": [
+    {
+      "seats": 2,
+      "maps": [
+        {
+          "name": "开阔前哨",
+          "cells": 10
+        },
+        {
+          "name": "星环回廊",
+          "cells": 11
+        },
+        {
+          "name": "十字枢纽",
+          "cells": 13
+        },
+        {
+          "name": "双线走廊",
+          "cells": 20
+        },
+        {
+          "name": "抗体王座",
+          "cells": 7
+        },
+        {
+          "name": "繁星蜂巢",
+          "cells": 21
+        }
+      ]
+    },
+    {
+      "seats": 3,
+      "maps": [
+        {
+          "name": "开阔前哨",
+          "cells": 15
+        },
+        {
+          "name": "星环回廊",
+          "cells": 16
+        },
+        {
+          "name": "十字枢纽",
+          "cells": 19
+        },
+        {
+          "name": "双线走廊",
+          "cells": 30
+        },
+        {
+          "name": "抗体王座",
+          "cells": 10
+        },
+        {
+          "name": "繁星蜂巢",
+          "cells": 31
+        }
+      ]
+    },
+    {
+      "seats": 4,
+      "maps": [
+        {
+          "name": "开阔前哨",
+          "cells": 20
+        },
+        {
+          "name": "星环回廊",
+          "cells": 21
+        },
+        {
+          "name": "十字枢纽",
+          "cells": 25
+        },
+        {
+          "name": "双线走廊",
+          "cells": 40
+        },
+        {
+          "name": "抗体王座",
+          "cells": 13
+        },
+        {
+          "name": "繁星蜂巢",
+          "cells": 41
+        }
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "src/core.js": "1fc38424ed3d7a9eba7d25ecc04a70e36aa5f96e218b07f08949a8a687a2b522",
+    "src/ai.js": "ffbd79d4ff67bff662e0a5c58b8d3ab28e3bff0c372e5c88a7a5f923bcec276d",
+    "src/arena.js": "21d75a0f010d7f6a0ec7aa96b937bc2daa4cfbf0d72b706553701f60f1ad6758",
+    "src/arena-maps.js": "aa046cc4e906b48d5698b04d7ad17cfbe31f24c2820c227b21812ba96fd30d78"
+  },
+  "rootCause": "Hive lacked center antibody: 2*10 =20 cells collided with double corridor20; for3/4 seats likewise30/40. Existing external source diff adds true center antibody:21/31/41. No tests changed, no src modifications by PPO worker."
+}

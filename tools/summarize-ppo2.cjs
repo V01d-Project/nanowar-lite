@@ -1,0 +1,1 @@
+'use strict';const fs=require('fs');for(const base of ['ppo-v2-pilot','ppo2-explore','ppo2-expansion']){const r=JSON.parse(fs.readFileSync('tools/'+base+'-curve.json'));console.log(JSON.stringify({base,config:r.config,last:r.curve.at(-1)}));}

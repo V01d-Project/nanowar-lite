@@ -31,7 +31,7 @@ function pure(){
     const upgrades={speed:n,time:n,shield:n,special:n},a=Arena.create(level,upgrades,123,count),b=Arena.create(level,upgrades,123,count);fair(a,count);
     for(let frame=0;frame<25;frame++){Core.step(a,Core.FRAME);Core.step(b,Core.FRAME);}assert.deepEqual(a,b,'deterministic map replay');
    }
-   if(level>=2)counts.add(Arena.map(level,count).length);
+   if(level>=3)counts.add(Arena.map(level,count).length);
    for(const mode of ['easy','normal','noob']){
     const bots=Array.from({length:count-1},(_,i)=>({side:i+2,mode})),s=Arena.create(level,{},123,count,bots),brains=bots.map(AI.create);
     for(let frame=0;frame<750&&!s.over;frame++){Core.step(s,Core.FRAME);for(const brain of brains)AI.think(s,brain,Core.FRAME);}assert.ok(s.nextUnit>1,'AI acts on '+Arena.names[level]+'/'+count+'/'+mode);

@@ -1,0 +1,677 @@
+{
+  "catalogue": [
+    "镜像实验场",
+    "镜像扩张",
+    "开阔前哨",
+    "星环回廊",
+    "十字枢纽",
+    "双线走廊",
+    "抗体王座",
+    "繁星蜂巢"
+  ],
+  "model": "tools/ppo2-current8-model.json",
+  "modelSha256": "156e0dcdd86d78f13b0ab26bdd2108dca9cd162cce1b6d709d41b57261f36725",
+  "sourceHashes": {
+    "src/core.js": "1fc38424ed3d7a9eba7d25ecc04a70e36aa5f96e218b07f08949a8a687a2b522",
+    "src/ai.js": "ffbd79d4ff67bff662e0a5c58b8d3ab28e3bff0c372e5c88a7a5f923bcec276d",
+    "src/arena.js": "21d75a0f010d7f6a0ec7aa96b937bc2daa4cfbf0d72b706553701f60f1ad6758",
+    "src/arena-maps.js": "a74d01f3f0c79215afbd64faf9c28668a4f1328f71a22af1793945c9807fd8f6",
+    "tools/train-ppo2-decisive.cjs": "5c475095542ee7f861f983e3fe0993f0d715e2dad4c9ed07c32eafcae975ba09"
+  },
+  "sets": [
+    {
+      "seedBase": 3100000701,
+      "games": 500,
+      "wins": 463,
+      "losses": 0,
+      "draws": 37,
+      "winRate": 0.926,
+      "meanSimSeconds": 65.32776000000003,
+      "byMap": [
+        {
+          "map": 0,
+          "name": "镜像实验场",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 1,
+          "name": "镜像扩张",
+          "games": 63,
+          "wins": 26,
+          "losses": 0,
+          "draws": 37
+        },
+        {
+          "map": 2,
+          "name": "开阔前哨",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 3,
+          "name": "星环回廊",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 4,
+          "name": "十字枢纽",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 5,
+          "name": "双线走廊",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 6,
+          "name": "抗体王座",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 7,
+          "name": "繁星蜂巢",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        }
+      ],
+      "wilson95": [
+        0.8996646988891734,
+        0.945839126122497
+      ],
+      "drawRate": 0.074,
+      "byMapRates": [
+        {
+          "map": 0,
+          "name": "镜像实验场",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 1,
+          "name": "镜像扩张",
+          "games": 63,
+          "wins": 26,
+          "losses": 0,
+          "draws": 37,
+          "winRate": 0.4126984126984127,
+          "drawRate": 0.5873015873015873
+        },
+        {
+          "map": 2,
+          "name": "开阔前哨",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 3,
+          "name": "星环回廊",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 4,
+          "name": "十字枢纽",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 5,
+          "name": "双线走廊",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 6,
+          "name": "抗体王座",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 7,
+          "name": "繁星蜂巢",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        }
+      ],
+      "passed": false
+    },
+    {
+      "seedBase": 3300000901,
+      "games": 500,
+      "wins": 455,
+      "losses": 2,
+      "draws": 43,
+      "winRate": 0.91,
+      "meanSimSeconds": 65.79255999999988,
+      "byMap": [
+        {
+          "map": 0,
+          "name": "镜像实验场",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 1,
+          "name": "镜像扩张",
+          "games": 63,
+          "wins": 18,
+          "losses": 2,
+          "draws": 43
+        },
+        {
+          "map": 2,
+          "name": "开阔前哨",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 3,
+          "name": "星环回廊",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 4,
+          "name": "十字枢纽",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 5,
+          "name": "双线走廊",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 6,
+          "name": "抗体王座",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 7,
+          "name": "繁星蜂巢",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        }
+      ],
+      "wilson95": [
+        0.8816900083946269,
+        0.9320578044100325
+      ],
+      "drawRate": 0.086,
+      "byMapRates": [
+        {
+          "map": 0,
+          "name": "镜像实验场",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 1,
+          "name": "镜像扩张",
+          "games": 63,
+          "wins": 18,
+          "losses": 2,
+          "draws": 43,
+          "winRate": 0.2857142857142857,
+          "drawRate": 0.6825396825396826
+        },
+        {
+          "map": 2,
+          "name": "开阔前哨",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 3,
+          "name": "星环回廊",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 4,
+          "name": "十字枢纽",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 5,
+          "name": "双线走廊",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 6,
+          "name": "抗体王座",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 7,
+          "name": "繁星蜂巢",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        }
+      ],
+      "passed": false
+    },
+    {
+      "seedBase": 3500001101,
+      "games": 500,
+      "wins": 462,
+      "losses": 2,
+      "draws": 36,
+      "winRate": 0.924,
+      "meanSimSeconds": 64.34959999999997,
+      "byMap": [
+        {
+          "map": 0,
+          "name": "镜像实验场",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 1,
+          "name": "镜像扩张",
+          "games": 63,
+          "wins": 25,
+          "losses": 2,
+          "draws": 36
+        },
+        {
+          "map": 2,
+          "name": "开阔前哨",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 3,
+          "name": "星环回廊",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 4,
+          "name": "十字枢纽",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 5,
+          "name": "双线走廊",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 6,
+          "name": "抗体王座",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        },
+        {
+          "map": 7,
+          "name": "繁星蜂巢",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0
+        }
+      ],
+      "wilson95": [
+        0.8974030342199025,
+        0.9441312892658914
+      ],
+      "drawRate": 0.072,
+      "byMapRates": [
+        {
+          "map": 0,
+          "name": "镜像实验场",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 1,
+          "name": "镜像扩张",
+          "games": 63,
+          "wins": 25,
+          "losses": 2,
+          "draws": 36,
+          "winRate": 0.3968253968253968,
+          "drawRate": 0.5714285714285714
+        },
+        {
+          "map": 2,
+          "name": "开阔前哨",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 3,
+          "name": "星环回廊",
+          "games": 63,
+          "wins": 63,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 4,
+          "name": "十字枢纽",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 5,
+          "name": "双线走廊",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 6,
+          "name": "抗体王座",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        },
+        {
+          "map": 7,
+          "name": "繁星蜂巢",
+          "games": 62,
+          "wins": 62,
+          "losses": 0,
+          "draws": 0,
+          "winRate": 1,
+          "drawRate": 0
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "total": {
+    "games": 1500,
+    "wins": 1380,
+    "losses": 4,
+    "draws": 116,
+    "winRate": 0.92,
+    "meanSimSeconds": 65.15664000000004,
+    "byMap": [
+      {
+        "map": 0,
+        "name": "镜像实验场",
+        "games": 189,
+        "wins": 189,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 1,
+        "name": "镜像扩张",
+        "games": 189,
+        "wins": 69,
+        "losses": 4,
+        "draws": 116
+      },
+      {
+        "map": 2,
+        "name": "开阔前哨",
+        "games": 189,
+        "wins": 189,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 3,
+        "name": "星环回廊",
+        "games": 189,
+        "wins": 189,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 4,
+        "name": "十字枢纽",
+        "games": 186,
+        "wins": 186,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 5,
+        "name": "双线走廊",
+        "games": 186,
+        "wins": 186,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 6,
+        "name": "抗体王座",
+        "games": 186,
+        "wins": 186,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 7,
+        "name": "繁星蜂巢",
+        "games": 186,
+        "wins": 186,
+        "losses": 0,
+        "draws": 0
+      }
+    ],
+    "wilson95": [
+      0.9051734054375523,
+      0.9326807941004843
+    ]
+  },
+  "byMapRates": [
+    {
+      "map": 0,
+      "name": "镜像实验场",
+      "games": 189,
+      "wins": 189,
+      "losses": 0,
+      "draws": 0,
+      "winRate": 1,
+      "drawRate": 0
+    },
+    {
+      "map": 1,
+      "name": "镜像扩张",
+      "games": 189,
+      "wins": 69,
+      "losses": 4,
+      "draws": 116,
+      "winRate": 0.36507936507936506,
+      "drawRate": 0.6137566137566137
+    },
+    {
+      "map": 2,
+      "name": "开阔前哨",
+      "games": 189,
+      "wins": 189,
+      "losses": 0,
+      "draws": 0,
+      "winRate": 1,
+      "drawRate": 0
+    },
+    {
+      "map": 3,
+      "name": "星环回廊",
+      "games": 189,
+      "wins": 189,
+      "losses": 0,
+      "draws": 0,
+      "winRate": 1,
+      "drawRate": 0
+    },
+    {
+      "map": 4,
+      "name": "十字枢纽",
+      "games": 186,
+      "wins": 186,
+      "losses": 0,
+      "draws": 0,
+      "winRate": 1,
+      "drawRate": 0
+    },
+    {
+      "map": 5,
+      "name": "双线走廊",
+      "games": 186,
+      "wins": 186,
+      "losses": 0,
+      "draws": 0,
+      "winRate": 1,
+      "drawRate": 0
+    },
+    {
+      "map": 6,
+      "name": "抗体王座",
+      "games": 186,
+      "wins": 186,
+      "losses": 0,
+      "draws": 0,
+      "winRate": 1,
+      "drawRate": 0
+    },
+    {
+      "map": 7,
+      "name": "繁星蜂巢",
+      "games": 186,
+      "wins": 186,
+      "losses": 0,
+      "draws": 0,
+      "winRate": 1,
+      "drawRate": 0
+    }
+  ],
+  "drawRate": 0.07733333333333334,
+  "passed": false,
+  "seconds": 10.069,
+  "method": "Frozen pure learned65D PPO tempo weights; inference observation corrected for friendly-fat production/live minis and normal-only weak all-in feature. Current8 real maps,balanced seats,Normal5s,real25fps,180s draws. Legacy episode index stride9 only for map/seat address,not removed map recreation. No learning on holdouts.",
+  "trainedGames": 10000
+}

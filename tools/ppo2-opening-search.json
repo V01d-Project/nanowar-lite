@@ -1,0 +1,122 @@
+[
+  {
+    "target": 1,
+    "pct": 25,
+    "wins": 0,
+    "draws": 10
+  },
+  {
+    "target": 1,
+    "pct": 50,
+    "wins": 0,
+    "draws": 10
+  },
+  {
+    "target": 1,
+    "pct": 75,
+    "wins": 0,
+    "draws": 10
+  },
+  {
+    "target": 1,
+    "pct": 100,
+    "wins": 0,
+    "draws": 10
+  },
+  {
+    "target": 2,
+    "pct": 25,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 2,
+    "pct": 50,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 2,
+    "pct": 75,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 2,
+    "pct": 100,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 4,
+    "pct": 25,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 4,
+    "pct": 50,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 4,
+    "pct": 75,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 4,
+    "pct": 100,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 6,
+    "pct": 25,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 6,
+    "pct": 50,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 6,
+    "pct": 75,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 6,
+    "pct": 100,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 8,
+    "pct": 25,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 8,
+    "pct": 50,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 8,
+    "pct": 75,
+    "wins": 0,
+    "draws": 0
+  },
+  {
+    "target": 8,
+    "pct": 100,
+    "wins": 0,
+    "draws": 0
+  }
+]

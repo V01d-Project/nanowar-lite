@@ -1,0 +1,92 @@
+{
+  "reproducedExactly": true,
+  "games": 500,
+  "modelSha256": "2f63d69e3be88bddedf5108457b1e74abfd4e8bccda5b2a5f26ebaba27045f06",
+  "evaluation": {
+    "games": 500,
+    "wins": 446,
+    "losses": 0,
+    "draws": 54,
+    "winRate": 0.892,
+    "meanSimSeconds": 75.32344000000056,
+    "byMap": [
+      {
+        "map": 0,
+        "name": "镜像实验场",
+        "games": 56,
+        "wins": 56,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 1,
+        "name": "镜像决斗",
+        "games": 56,
+        "wins": 2,
+        "losses": 0,
+        "draws": 54
+      },
+      {
+        "map": 2,
+        "name": "镜像扩张",
+        "games": 56,
+        "wins": 56,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 3,
+        "name": "开阔前哨",
+        "games": 56,
+        "wins": 56,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 4,
+        "name": "星环回廊",
+        "games": 56,
+        "wins": 56,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 5,
+        "name": "十字枢纽",
+        "games": 55,
+        "wins": 55,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 6,
+        "name": "双线走廊",
+        "games": 55,
+        "wins": 55,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 7,
+        "name": "抗体王座",
+        "games": 55,
+        "wins": 55,
+        "losses": 0,
+        "draws": 0
+      },
+      {
+        "map": 8,
+        "name": "繁星蜂巢",
+        "games": 55,
+        "wins": 55,
+        "losses": 0,
+        "draws": 0
+      }
+    ],
+    "wilson95": [
+      0.8617447145307382,
+      0.9162775845410336
+    ]
+  },
+  "elapsedSeconds": 1.721
+}
