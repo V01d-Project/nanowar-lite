@@ -6,7 +6,7 @@ const definitions=[
  {name:'镜像决斗',description:'经典无中立点单基地对决'},
  {name:'镜像扩张',description:'经典主基地与双中立点'},
  {name:'开阔前哨',description:'稀疏小规模：长距离交战与低成本前哨',sector:[
-  {x:196,y:0,size:94,own:1,u:58},{x:86,y:0,size:50,own:0,u:8}]},
+  {x:196,y:0,size:94,own:1,u:58},{x:86,y:0,size:50,own:0,u:8},{x:44,y:0,size:34,own:0,u:6}]},
  {name:'星环回廊',description:'四段中立环带，沿环扩张与侧袭',sector:[
   {x:211,y:0,size:82,own:1,u:62},
   ...[-36,-12,12,36].map(deg=>({x:150*Math.cos(deg*Math.PI/180),y:150*Math.sin(deg*Math.PI/180),size:42,own:0,u:11}))]},

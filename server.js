@@ -85,8 +85,8 @@ function createServer(config={}){
  if(url.pathname==='/favicon.ico'){res.writeHead(204).end();return;}
  if(!['GET','HEAD'].includes(req.method))throw fail(405,'方法不支持');
  const pathname=decodeURIComponent(url.pathname),relative=pathname==='/'?'index.html':pathname.slice(1);
- if(!(relative==='index.html'||/^src\/[a-z0-9-]+\.(js|css)$/.test(relative)))throw fail(404,'文件不存在');
- const file=path.join(ROOT,relative),data=await fs.promises.readFile(file);res.writeHead(200,{'Content-Type':file.endsWith('.js')?'application/javascript; charset=utf-8':file.endsWith('.css')?'text/css; charset=utf-8':'text/html; charset=utf-8','Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(req.method==='HEAD'?undefined:data);
+ if(!(relative==='index.html'||relative==='manifest.webmanifest'||relative==='sw.js'||/^src\/[a-z0-9-]+\.(js|css)$/.test(relative)||/^icons\/icon-\d+\.png$/.test(relative)))throw fail(404,'文件不存在');
+ const file=path.join(ROOT,relative),data=await fs.promises.readFile(file),ct=file.endsWith('.js')?'application/javascript; charset=utf-8':file.endsWith('.css')?'text/css; charset=utf-8':file.endsWith('.webmanifest')?'application/manifest+json; charset=utf-8':file.endsWith('.png')?'image/png':'text/html; charset=utf-8';res.writeHead(200,{'Content-Type':ct,'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer'});res.end(req.method==='HEAD'?undefined:data);
  }catch(e){if(!res.headersSent)json(res,e.status|| (e.code==='ENOENT'?404:500),{error:e.status?e.message:'请求失败'});else res.end();}});
  const timer=setInterval(()=>{const now=Date.now();for(const r of rooms.values()){
  for(const p of [...humans(r)]){if(p.stream&&now-p.lastSeen>15000){const stream=p.stream;detach(p,stream);stream.destroy();}if(p.stream||now<p.deadline)continue;sessions.delete(p.token);p.forfeited=true;
