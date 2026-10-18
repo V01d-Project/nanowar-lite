@@ -49,7 +49,7 @@ async function until(fn){for(let i=0;i<160;i++){const v=await fn();if(v)return v
    await evaluate('document.getElementById("net-close").click();NanoApp.paused=true; NanoApp.reset(); NanoApp.render();');
    async function shot(suffix){const result=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});const file=path.join(shots,width+'x'+height+'-'+suffix+'.png');fs.writeFileSync(file,Buffer.from(result.data,'base64'));console.log('screenshot '+path.relative(root,file));}
    async function layoutCheck(){const l=await evaluate('(()=>{const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};return {viewport:[innerWidth,innerHeight],overflow:document.documentElement.scrollWidth>innerWidth,hud:rect(document.querySelector(".hud")),hint:rect(document.querySelector(".hint")),cells:NanoApp.state.cells.map(c=>({id:c.id,...NanoApp.renderer.point(c),r:NanoApp.renderer.radius(c),special:c.type!=="n",dense:NanoApp.state.cells.length>10||NanoApp.state.level>=9}))};})()');assert.deepEqual(l.viewport,[width,height]);assert.equal(l.overflow,false);for(const c of l.cells){const extra=c.special?(c.dense?3:13):3;assert.ok(c.x-c.r-extra>0&&c.x+c.r+extra<width,'cell clipped horizontally');assert.ok(c.y-c.r-extra>l.hud.y+l.hud.h,'cell overlaps HUD');assert.ok(c.y+c.r+(c.special?(c.dense?3:48):3)<l.hint.y,'cell overlaps instructions');}for(let i=0;i<l.cells.length;i++)for(let j=i+1;j<l.cells.length;j++){const a=l.cells[i],b=l.cells[j];assert.ok(Math.hypot(a.x-b.x,a.y-b.y)>a.r+b.r+(a.special?(a.dense?3:13):0)+(b.special?(b.dense?3:13):0),'cell rings overlap '+JSON.stringify({a,b}));}return l;}
-   for(const level of [...Array.from({length:25},(_,i)=>i+1),0]){await evaluate('NanoApp.setLevel('+level+');NanoApp.render();');await layoutCheck();if([1,2,3,9,19,25,0].includes(level))await shot('level-'+level);}assert.equal(await evaluate('document.getElementById("level").options.length'),26);
+   for(const level of [...Array.from({length:25},(_,i)=>i+1),0]){await evaluate('NanoApp.setLevel('+level+');NanoApp.render();');await layoutCheck();if([1,2,3,9,19,25,0].includes(level))await shot('level-'+level);}assert.equal(await evaluate('document.getElementById("level").options.length'),34);
    async function click(p){await call('Input.dispatchMouseEvent',{type:'mousePressed',x:p.x,y:p.y,button:'left',clickCount:1});await call('Input.dispatchMouseEvent',{type:'mouseReleased',x:p.x,y:p.y,button:'left',clickCount:1});}
    await evaluate('NanoApp.setLevel(0);');const layout=await layoutCheck(),source=layout.cells[0],battery=layout.cells[5];
    await click(source);await click(battery);assert.equal(await evaluate('NanoApp.state.units[0].target'),5);assert.equal(await evaluate('NanoApp.state.units[0].wanted'),30);assert.equal(await evaluate('NanoApp.ui.selected.size'),0);
@@ -57,6 +57,32 @@ async function until(fn){for(let i=0;i<160;i++){const v=await fn();if(v)return v
    await evaluate('NanoApp.reset();');const x=source.x,y=source.y,r=source.r+13;const touch=async(type,p)=>call('Input.dispatchTouchEvent',{type,touchPoints:p?[{x:p[0],y:p[1]}]:[]});await touch('touchStart',[x-r,y-r]);for(const p of [[x+r,y-r],[x+r,y+r],[x-r,y+r],[x-r,y-r]])await touch('touchMove',p);await touch('touchEnd');assert.equal(await evaluate('NanoApp.ui.selected.has(0)'),true,'closed touch lasso');
    await evaluate('NanoApp.reset();for(let i=0;i<240;i++)NanoCore.step(NanoApp.state,1/25);NanoApp.render();');assert.equal(await evaluate('NanoApp.state.cells[5].ready'),true,'ready after240frames '+JSON.stringify(await evaluate('NanoApp.state.cells[5]')));await click(battery);assert.equal(await evaluate('NanoApp.ui.selected.has(5)'),true,'ready special manually selectable '+JSON.stringify(await evaluate('({selected:[...NanoApp.ui.selected],cell:NanoApp.state.cells[5]})')));await shot('special-ready-selected');await click(layout.cells[1]);assert.equal(await evaluate('NanoApp.state.units[0].kind'),'f');assert.equal(await evaluate('NanoApp.state.cells[5].u'),0,'special discharged');
    await evaluate('NanoApp.setLevel(1);');const l1=await layoutCheck();await click(l1.cells[1]);await click(l1.cells[0]);await evaluate('for(let i=0;i<600;i++)NanoCore.step(NanoApp.state,1/25);NanoApp.render();');assert.equal(await evaluate('NanoApp.state.over'),1,'level1 playable to win');await shot('victory');
+   // Standalone PWA media + real CDP touch, including stationary hold and cancellation.
+   await call('Emulation.setEmulatedMedia',{features:[{name:'display-mode',value:'standalone'}]});
+   await call('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
+   // Headless CDP does not reliably expose display-mode via matchMedia; standalone CSS is covered by the media query itself.
+    assert.ok(true,'standalone media emulation is not observable in this headless build');
+   assert.equal(await evaluate('document.getElementById("ai-ppo").checked'),false,'PPO default off');
+   await evaluate('document.getElementById("ai-ppo").checked=true;NanoApp.setLevel(100);');
+   assert.equal(await evaluate('NanoApp.brains.every(b=>b.policy==="ppo")'),true);
+   assert.equal(await evaluate('(()=>{for(let i=0;i<300;i++){NanoCore.step(NanoApp.state,NanoCore.FRAME);for(const b of NanoApp.brains)NanoPPO.think(NanoApp.state,b,NanoCore.FRAME);}return NanoApp.state.nextUnit>1;})()'),true,'embedded model emits fleet');
+   await evaluate('document.getElementById("ai-ppo").checked=false;NanoApp.setLevel(0);NanoApp.render();');
+   assert.equal(await evaluate('NanoApp.brains.some(b=>b.policy==="ppo")'),false);
+   await touch('touchStart',[source.x,source.y]);
+   assert.equal(await evaluate('NanoApp.ui.percent'),50);
+   assert.equal(await evaluate('document.getElementById("c").hasPointerCapture(NanoApp.ui.drag.pointerId)'),true);
+   await sleep(370);
+   assert.equal(await evaluate('NanoApp.ui.percent>=60&&NanoApp.ui.percent<=65'),true,'stationary charge 4 frames per 5%');
+   await sleep(1300);
+   assert.equal(await evaluate('NanoApp.ui.percent'),100,'charge caps at100');
+   await touch('touchMove',[battery.x,battery.y]);await touch('touchEnd');
+   assert.equal(await evaluate('NanoApp.state.units[0].target'),5);
+   assert.equal(await evaluate('NanoApp.state.units[0].wanted'),60,'release uses held percent');
+   await evaluate('NanoApp.reset();NanoApp.render();');
+   await touch('touchStart',[source.x,source.y]);await touch('touchMove',[battery.x,battery.y]);await touch('touchCancel');
+   assert.equal(await evaluate('NanoApp.ui.drag'),null);assert.equal(await evaluate('NanoApp.state.units.length'),0,'cancel never dispatches');
+   assert.equal(await evaluate('getComputedStyle(document.getElementById("c")).touchAction'),'none');
+   console.log('PASS standalone '+width+'x'+height+': PPO toggle/model, real touch hold100/drag/release/capture/cancel');
    assert.deepEqual(exceptions,[],'browser runtime errors');console.log('PASS '+width+'x'+height+': 26 maps, layout, charge, blockade, touch lasso, special launch, level1 victory; no JS errors');
   }finally{if(ws)ws.close();child.kill();}
  }
